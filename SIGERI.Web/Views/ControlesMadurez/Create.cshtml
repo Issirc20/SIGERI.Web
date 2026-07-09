@@ -1,0 +1,430 @@
+@model SIGERI.Application.ControlesMadurez.Commands.RegistrarControlMadurezCommand
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Nuevo Control de Madurez";
+}
+
+<style>
+    /* PAGE HEADER */
+    .sig-form-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 2rem 0 1.5rem 0;
+        border-bottom: 1px solid var(--sig-dark-border);
+    }
+
+    .sig-form-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .sig-form-title h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--sig-dark-text);
+        margin: 0;
+    }
+
+    .sig-form-title .badge {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .sig-form-desc {
+        color: var(--sig-dark-muted);
+        font-size: 0.95rem;
+    }
+
+    /* FORM CONTAINER */
+    .sig-form-container {
+        background: linear-gradient(180deg, var(--sig-dark-surface) 0%, var(--sig-dark-surface-2) 100%);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.85rem;
+        padding: 2rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    /* FORM GROUPS */
+    .sig-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .sig-form-group label {
+        display: block;
+        color: var(--sig-dark-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sig-form-group .form-control,
+    .sig-form-group .form-select {
+        background: var(--sig-dark-surface-2);
+        border: 1px solid var(--sig-dark-border);
+        color: var(--sig-dark-text);
+        border-radius: 0.6rem;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .sig-form-group .form-control:focus,
+    .sig-form-group .form-select:focus {
+        outline: none;
+        border-color: var(--sig-accent);
+        background: var(--sig-dark-surface);
+        box-shadow: 0 0 12px rgba(93, 63, 160, 0.3);
+    }
+
+    /* FORM ROW */
+    .sig-form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* MATURITY LEVEL VISUALIZATION */
+    .maturity-levels {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .maturity-level {
+        padding: 1rem;
+        text-align: center;
+        border-radius: 0.6rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+
+    .maturity-level:hover {
+        transform: scale(1.08);
+    }
+
+    .level-0 { background: linear-gradient(135deg, #6b7280, #4b5563); }
+    .level-1 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .level-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .level-3 { background: linear-gradient(135deg, #10b981, #059669); }
+    .level-4 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+    /* PROGRESS BARS */
+    .progress-wrapper {
+        margin-top: 1rem;
+    }
+
+    .progress-label {
+        color: var(--sig-dark-muted);
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .progress-bar-custom {
+        height: 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--sig-accent), #7c3aed);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 0.85rem;
+    }
+
+    /* ACTIONS */
+    .sig-form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--sig-dark-border);
+    }
+
+    .btn-sig-primary {
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, var(--sig-accent) 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        border-radius: 0.6rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px rgba(93, 63, 160, 0.3);
+    }
+
+    .btn-sig-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(93, 63, 160, 0.4);
+    }
+
+    .btn-sig-secondary {
+        padding: 0.75rem 2rem;
+        background: transparent;
+        color: var(--sig-dark-text);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.6rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sig-secondary:hover {
+        border-color: var(--sig-accent);
+        background: rgba(93, 63, 160, 0.1);
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .sig-form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .maturity-levels {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-form-header">
+    <div class="sig-form-title">
+        <h1><i class="fa-solid fa-chart-column" style="color: #3b82f6;"></i> Registrar Control de Madurez</h1>
+        <span class="badge">NIST CSF 2.0 / CIS v8</span>
+    </div>
+    <p class="sig-form-desc">
+        Define un control de seguridad con su nivel de madurez actual y objetivo según frameworks NIST o CIS.
+    </p>
+</div>
+
+<!-- FORM CONTAINER -->
+<div class="sig-form-container">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- SECTION 1: IDENTIFICATION -->
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-fingerprint" style="color: var(--sig-accent);"></i> Identificación
+            </h3>
+
+            <div class="sig-form-row">
+                <div class="sig-form-group">
+                    <label for="codigo">Código</label>
+                    <input type="text" id="codigo" name="codigo" class="form-control" placeholder="NIST-ID.X.X" required>
+                </div>
+                <div class="sig-form-group">
+                    <label for="nombre">Nombre del Control</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" 
+                           placeholder="Descripción del control" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: CLASSIFICATION -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-sitemap" style="color: var(--sig-accent);"></i> Clasificación
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="funcion">Función NIST CSF 2.0</label>
+                <select id="funcion" name="funcion" class="form-select" required>
+                    <option value="">Seleccionar función...</option>
+                    @foreach (var funcion in Enum.GetValues<FuncionNist>())
+                    {
+                        <option value="@funcion">@funcion.ToString() - @GetFunctionDescription(funcion)</option>
+                    }
+                </select>
+                <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                    <i class="fa-solid fa-info-circle"></i> Selecciona la función NIST correspondiente
+                </small>
+            </div>
+        </div>
+
+        <!-- SECTION 3: MATURITY LEVELS -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-stairs" style="color: var(--sig-accent);"></i> Nivel de Madurez
+            </h3>
+
+            <!-- Current Level -->
+            <div class="sig-form-group">
+                <label for="nivelActual">Nivel Actual</label>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <input type="range" id="nivelActual" name="nivelActual" class="form-control" 
+                           min="0" max="4" value="2" 
+                           onchange="updateProgressBars()"
+                           style="flex: 1; height: 1.5rem; accent-color: var(--sig-accent);">
+                    <span id="currentLevelValue" style="font-weight: 700; color: var(--sig-accent); min-width: 60px; text-align: center;">
+                        2/4
+                    </span>
+                </div>
+
+                <!-- Maturity Levels Visual -->
+                <div class="maturity-levels">
+                    <div class="maturity-level level-0" onclick="setLevel('nivelActual', 0)">
+                        <div>0️⃣</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem;">No</div>
+                    </div>
+                    <div class="maturity-level level-1" onclick="setLevel('nivelActual', 1)">
+                        <div>1️⃣</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem;">Inicial</div>
+                    </div>
+                    <div class="maturity-level level-2" onclick="setLevel('nivelActual', 2)">
+                        <div>2️⃣</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem;">Repetible</div>
+                    </div>
+                    <div class="maturity-level level-3" onclick="setLevel('nivelActual', 3)">
+                        <div>3️⃣</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem;">Definido</div>
+                    </div>
+                    <div class="maturity-level level-4" onclick="setLevel('nivelActual', 4)">
+                        <div>4️⃣</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem;">Optimizado</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Level -->
+            <div class="sig-form-group" style="margin-top: 2rem;">
+                <label for="nivelObjetivo">Nivel Objetivo</label>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <input type="range" id="nivelObjetivo" name="nivelObjetivo" class="form-control"
+                           min="0" max="4" value="4"
+                           onchange="updateProgressBars()"
+                           style="flex: 1; height: 1.5rem; accent-color: var(--sig-accent);">
+                    <span id="targetLevelValue" style="font-weight: 700; color: var(--sig-accent); min-width: 60px; text-align: center;">
+                        4/4
+                    </span>
+                </div>
+
+                <div class="maturity-levels">
+                    <div class="maturity-level level-0" onclick="setLevel('nivelObjetivo', 0)">
+                        <div>0️⃣</div>
+                    </div>
+                    <div class="maturity-level level-1" onclick="setLevel('nivelObjetivo', 1)">
+                        <div>1️⃣</div>
+                    </div>
+                    <div class="maturity-level level-2" onclick="setLevel('nivelObjetivo', 2)">
+                        <div>2️⃣</div>
+                    </div>
+                    <div class="maturity-level level-3" onclick="setLevel('nivelObjetivo', 3)">
+                        <div>3️⃣</div>
+                    </div>
+                    <div class="maturity-level level-4" onclick="setLevel('nivelObjetivo', 4)">
+                        <div>4️⃣</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gap Visualization -->
+            <div class="progress-wrapper">
+                <div class="progress-label">
+                    <span>Brecha de Madurez</span>
+                    <span id="gapValue" style="color: #ff6b7a;">2 niveles</span>
+                </div>
+                <div class="progress-bar-custom">
+                    <div class="progress-fill" id="gapBar" style="width: 50%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: DESCRIPTION -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-file-text" style="color: var(--sig-accent);"></i> Descripción
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="descripcion">Detalle del Control</label>
+                <textarea id="descripcion" name="descripcion" class="form-control" rows="3"
+                          placeholder="Acciones, procesos, responsables, fechas planificadas..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 5: AUDIT -->
+        <div style="padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-clock" style="color: var(--sig-accent);"></i> Auditoría
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="creadoPor">Creado por</label>
+                <input type="text" id="creadoPor" name="creadoPor" class="form-control" value="sistema" readonly>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="sig-form-actions">
+            <button type="submit" class="btn-sig-primary">
+                <i class="fa-solid fa-save"></i> Guardar Control
+            </button>
+            <a asp-action="Index" class="btn-sig-secondary">
+                <i class="fa-solid fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function setLevel(inputId, value) {
+        document.getElementById(inputId).value = value;
+        updateProgressBars();
+    }
+
+    function updateProgressBars() {
+        const current = parseInt(document.getElementById('nivelActual').value);
+        const target = parseInt(document.getElementById('nivelObjetivo').value);
+        const gap = target - current;
+
+        document.getElementById('currentLevelValue').textContent = current + '/4';
+        document.getElementById('targetLevelValue').textContent = target + '/4';
+        document.getElementById('gapValue').textContent = gap + (gap === 1 ? ' nivel' : ' niveles');
+
+        const gapPercent = (gap / 4) * 100;
+        const gapBar = document.getElementById('gapBar');
+        gapBar.style.width = gapPercent + '%';
+        gapBar.textContent = gap > 0 ? gap : '✓';
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', updateProgressBars);
+</script>
+
+@functions {
+    private string GetFunctionDescription(FuncionNist funcion) {
+        return funcion switch {
+            FuncionNist.Govern => "Establecimiento de políticas y procesos",
+            FuncionNist.Identify => "Descubrimiento y clasificación de activos",
+            FuncionNist.Protect => "Implementación de medidas de seguridad",
+            FuncionNist.Detect => "Monitoreo y detección de incidentes",
+            FuncionNist.Respond => "Plan de respuesta ante incidentes",
+            FuncionNist.Recover => "Recuperación y continuidad del negocio",
+            _ => "Función NIST CSF"
+        };
+    }
+}

@@ -1,0 +1,80 @@
+@model SIGERI.Application.DTOs.PlanTratamientoDto
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Editar Plan de Tratamiento";
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <div class="sig-page-subtitle"><i class="fa-solid fa-pen"></i> Editar Plan de Tratamiento</div>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
+</div>
+
+<div class="sig-card p-4">
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Estrategia</label>
+                <select name="estrategia" class="form-select sig-input">
+                    @foreach (var opt in new[]{"Mitigación","Transferencia","Aceptación","Eliminación"})
+                    {
+                        <option value="@opt" selected="@(opt == Model.Estrategia)">@opt</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Estado</label>
+                <select name="estado" class="form-select sig-input">
+                    @foreach (EstadoPlan e in Enum.GetValues(typeof(EstadoPlan)))
+                    {
+                        <option value="@e" selected="@(e == Model.Estado)">@e</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Descripción</label>
+                <textarea name="descripcion" class="form-control sig-input" rows="3">@Model.Descripcion</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha Inicio</label>
+                <input type="date" name="fechaInicio" class="form-control sig-input" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha Término</label>
+                <input type="date" name="fechaTermino" class="form-control sig-input" value="@Model.FechaTermino.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">ALE Base (S/)</label>
+                <input type="number" name="aleBase" class="form-control sig-input" value="@Model.AleBase" min="0" step="1000" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">% Mitigación</label>
+                <input type="number" name="porcentajeMitigacion" class="form-control sig-input" value="@Model.PorcentajeMitigacion" min="0" max="100" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Costo Salvaguarda (S/)</label>
+                <input type="number" name="costoSalvaguarda" class="form-control sig-input" value="@Model.CostoSalvaguarda" min="0" step="1000" />
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        { <div>@err.ErrorMessage</div> }
+                    </div>
+                </div>
+            }
+
+            <div class="col-12 d-flex gap-2 justify-content-end">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-sig"><i class="fa-solid fa-save me-2"></i>Actualizar</button>
+            </div>
+        </div>
+    </form>
+</div>

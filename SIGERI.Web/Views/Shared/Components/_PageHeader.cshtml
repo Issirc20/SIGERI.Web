@@ -1,0 +1,10 @@
+@model dynamic
+<div class="page-header d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h4 mb-0">@Model.Title</h1>
+        @if(Model?.Subtitle != null){ <div class="text-muted small">@Model.Subtitle</div> }
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        @if(Model?.Actions != null){ @Html.Raw(Model.Actions) }
+    </div>
+</div>

@@ -1,0 +1,35 @@
+@model dynamic
+@{
+    string? id = null;
+    string? title = null;
+    string? control = null;
+    string? badge = null;
+    string? badgeBg = null;
+    string? badgeColor = null;
+
+    if (Model != null)
+    {
+        var t = Model.GetType();
+        var pId = t.GetProperty("Id"); if (pId != null) id = pId.GetValue(Model)?.ToString();
+        var pTitle = t.GetProperty("Title"); if (pTitle != null) title = pTitle.GetValue(Model)?.ToString();
+        var pControl = t.GetProperty("Control"); if (pControl != null) control = pControl.GetValue(Model)?.ToString();
+        var pBadge = t.GetProperty("Badge"); if (pBadge != null) badge = pBadge.GetValue(Model)?.ToString();
+        var pBadgeBg = t.GetProperty("BadgeBg"); if (pBadgeBg != null) badgeBg = pBadgeBg.GetValue(Model)?.ToString();
+        var pBadgeColor = t.GetProperty("BadgeColor"); if (pBadgeColor != null) badgeColor = pBadgeColor.GetValue(Model)?.ToString();
+    }
+}
+
+<div class="sig-card risk-card">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <div class="risk-id">@(id ?? "")</div>
+            <div class="risk-scenario">@(title ?? "")</div>
+        </div>
+        <div>
+            <span class="risk-badge badge" style="background:@(badgeBg ?? "#333");color:@(badgeColor ?? "#fff");">@(badge ?? "")</span>
+        </div>
+    </div>
+    <div class="mt-2">
+        <div class="small text-muted">@(control ?? "")</div>
+    </div>
+</div>

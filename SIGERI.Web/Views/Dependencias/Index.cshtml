@@ -1,0 +1,214 @@
+@using SIGERI.Domain.Enums
+@model IReadOnlyCollection<SIGERI.Application.DTOs.DependenciaActivoDto>
+@{
+    ViewData["Title"] = "Dependencias Operativas";
+}
+
+<style>
+    .sig-arrow {
+        color: var(--sig-accent-2);
+        font-weight: 700;
+        margin: 0 0.5rem;
+    }
+
+    .sig-asset-name {
+        font-weight: 600;
+        color: var(--sig-dark-text);
+    }
+
+    .sig-dependency-type {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .sig-criticality-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .sig-criticality-critical {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b7a;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .sig-criticality-high {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .sig-criticality-media {
+        background: rgba(255, 159, 64, 0.2);
+        color: #ff9f40;
+        border: 1px solid rgba(255, 159, 64, 0.3);
+    }
+
+    .sig-criticality-baja {
+        background: rgba(76, 175, 80, 0.2);
+        color: #66bb6a;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .sig-description {
+        color: var(--sig-dark-muted);
+        font-size: 0.85rem;
+        max-width: 250px;
+        white-space: normal;
+    }
+
+    @@media (max-width: 768px) {
+        .sig-description {
+            max-width: 150px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .sig-asset-name {
+            font-size: 0.8rem;
+        }
+
+        .sig-description {
+            max-width: 100px;
+            font-size: 0.75rem;
+        }
+
+        .sig-dependency-type,
+        .sig-criticality-badge {
+            font-size: 0.65rem;
+            padding: 0.3rem 0.5rem;
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <span class="badge" style="width: fit-content; background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.4); padding: 0.5rem 1rem; border-radius: 999px;">
+            DEPENDENCIAS
+        </span>
+        <div class="sig-page-subtitle">
+            <i class="fa-solid fa-diagram-project"></i>
+            Mapa de Dependencias Operativas
+        </div>
+        <p class="sig-page-desc">
+            Relaciones de impacto entre activos origen y destino en la cadena operativa.
+        </p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Create" class="btn btn-sig">
+            <i class="fa-solid fa-link me-2"></i>Nueva Dependencia
+        </a>
+    </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="sig-stats-row">
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Total Relaciones</div>
+        <div class="sig-stat-value">@Model.Count</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Críticas</div>
+        <div class="sig-stat-value" style="color: #ff6b7a;">@Model.Count(d => d.CriticidadOperativa == (int)Criticidad.Critica)</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Altas</div>
+        <div class="sig-stat-value" style="color: #ffc107;">@Model.Count(d => d.CriticidadOperativa == (int)Criticidad.Alta)</div>
+    </div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div class="sig-controls-bar">
+    <div class="sig-search-box">
+        <i class="fa-solid fa-search sig-search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por origen, destino o tipo...">
+    </div>
+</div>
+
+<!-- TABLE -->
+@if (Model.Any())
+{
+    <div class="sig-table-wrapper">
+        <table class="sig-table">
+            <thead>
+                <tr>
+                    <th>Origen</th>
+                    <th></th>
+                    <th>Destino</th>
+                    <th>Tipo</th>
+                    <th>Criticidad</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var criticalityClass = item.CriticidadOperativa == (int)Criticidad.Critica ? "sig-criticality-critical"
+                        : item.CriticidadOperativa == (int)Criticidad.Alta ? "sig-criticality-high"
+                        : item.CriticidadOperativa == (int)Criticidad.Media ? "sig-criticality-media"
+                        : "sig-criticality-baja";
+
+                    <tr>
+                        <td>
+                            <span class="sig-asset-name">@item.ActivoOrigen</span>
+                        </td>
+                        <td>
+                            <span class="sig-arrow">→</span>
+                        </td>
+                        <td>
+                            <span class="sig-asset-name">@item.ActivoDestino</span>
+                        </td>
+                        <td>
+                            <span class="sig-dependency-type">@item.TipoDependencia</span>
+                        </td>
+                        <td>
+                            <span class="sig-criticality-badge @criticalityClass">
+                                @item.CriticidadOperativa
+                            </span>
+                        </td>
+                        <td>
+                            <span class="sig-description">@item.Descripcion</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="sig-card sig-empty-state">
+        <div class="sig-empty-icon">
+            <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div class="sig-empty-title">No hay dependencias registradas</div>
+        <p>Crea tu primera dependencia entre activos para mapear la cadena operativa.</p>
+        <a asp-action="Create" class="btn btn-sig mt-3">
+            <i class="fa-solid fa-plus me-2"></i>Crear Dependencia
+        </a>
+    </div>
+}
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('.sig-table tbody tr');
+
+    searchInput?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>

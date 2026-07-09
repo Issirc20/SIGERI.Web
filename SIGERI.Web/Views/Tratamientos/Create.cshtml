@@ -1,0 +1,137 @@
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Nuevo Plan de Tratamiento";
+    var riesgos = ViewBag.Riesgos as IReadOnlyCollection<SIGERI.Application.DTOs.RiesgoDto> ?? [];
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <div class="sig-page-subtitle"><i class="fa-solid fa-shield-plus"></i> Nuevo Plan de Tratamiento</div>
+        <p class="sig-page-desc">Defina la estrategia, costo e indicadores financieros (ALE, ROSI) del tratamiento.</p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
+</div>
+
+<div class="sig-card p-4">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row g-3">
+
+            <!-- SECCIÓN 1: Riesgo y Estrategia -->
+            <div class="col-12"><h6 class="sig-section-subtitle"><i class="fa-solid fa-bullseye me-2"></i>Riesgo y Estrategia</h6></div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Riesgo Asociado <span class="text-danger">*</span></label>
+                <select name="riesgoId" class="form-select sig-input" required>
+                    <option value="">— Seleccione el riesgo —</option>
+                    @foreach (var r in riesgos)
+                    {
+                        <option value="@r.Id">@r.Nombre (P:@r.ProbabilidadValor × I:@r.ImpactoValor = @r.PuntajeRiesgo)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Estrategia <span class="text-danger">*</span></label>
+                <select name="estrategia" class="form-select sig-input" required>
+                    <option value="Mitigación">Mitigación</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Aceptación">Aceptación</option>
+                    <option value="Eliminación">Eliminación</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+                <textarea name="descripcion" class="form-control sig-input" rows="3" required></textarea>
+            </div>
+
+            <!-- SECCIÓN 2: Vigencia y Estado -->
+            <div class="col-12 mt-2"><h6 class="sig-section-subtitle"><i class="fa-solid fa-calendar me-2"></i>Vigencia y Estado</h6></div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha Inicio <span class="text-danger">*</span></label>
+                <input type="date" name="fechaInicio" class="form-control sig-input" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha Término <span class="text-danger">*</span></label>
+                <input type="date" name="fechaTermino" class="form-control sig-input" value="@DateTime.Today.AddMonths(6).ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Estado</label>
+                <select name="estado" class="form-select sig-input">
+                    @foreach (EstadoPlan e in Enum.GetValues(typeof(EstadoPlan)))
+                    {
+                        <option value="@e">@e</option>
+                    }
+                </select>
+            </div>
+
+            <!-- SECCIÓN 3: Indicadores Financieros -->
+            <div class="col-12 mt-2"><h6 class="sig-section-subtitle"><i class="fa-solid fa-chart-line me-2"></i>Indicadores Financieros (ROSI)</h6></div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">ALE Base (S/) <span class="text-danger">*</span></label>
+                <input type="number" name="aleBase" id="aleBase" class="form-control sig-input" min="0" step="1000" placeholder="870000" required oninput="calcularRosi()" />
+                <small class="text-muted">Pérdida anualizada esperada sin tratamiento.</small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">% Mitigación (0–100)</label>
+                <input type="number" name="porcentajeMitigacion" id="pctMitig" class="form-control sig-input" min="0" max="100" step="1" value="60" oninput="calcularRosi()" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Costo Salvaguarda (S/)</label>
+                <input type="number" name="costoSalvaguarda" id="costo" class="form-control sig-input" min="0" step="1000" placeholder="0" oninput="calcularRosi()" />
+            </div>
+
+            <!-- Resultado ROSI en tiempo real -->
+            <div class="col-12">
+                <div class="sig-card p-3" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25)">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="small text-muted">ALE Residual Estimado</div>
+                            <div class="fw-bold fs-5" style="color:#f59e0b" id="lblAleResidual">S/ —</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">Ahorro Estimado</div>
+                            <div class="fw-bold fs-5" style="color:#3b82f6" id="lblAhorro">S/ —</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">ROSI</div>
+                            <div class="fw-bold fs-5" style="color:#10b981" id="lblRosi">— %</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        { <div>@error.ErrorMessage</div> }
+                    </div>
+                </div>
+            }
+
+            <div class="col-12 d-flex gap-2 justify-content-end">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-sig"><i class="fa-solid fa-save me-2"></i>Guardar Plan</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function calcularRosi() {
+    const ale  = parseFloat(document.getElementById('aleBase').value) || 0;
+    const pct  = parseFloat(document.getElementById('pctMitig').value) || 0;
+    const cost = parseFloat(document.getElementById('costo').value) || 0;
+
+    const aleResidual = ale * (1 - pct / 100);
+    const ahorro      = ale - aleResidual;
+    const rosi        = cost > 0 ? ((ahorro - cost) / cost) * 100 : 0;
+
+    document.getElementById('lblAleResidual').textContent = 'S/ ' + aleResidual.toLocaleString('es-PE', {maximumFractionDigits: 0});
+    document.getElementById('lblAhorro').textContent      = 'S/ ' + ahorro.toLocaleString('es-PE', {maximumFractionDigits: 0});
+    document.getElementById('lblRosi').textContent        = rosi.toFixed(1) + '%';
+    document.getElementById('lblRosi').style.color        = rosi >= 0 ? '#10b981' : '#ef4444';
+}
+</script>

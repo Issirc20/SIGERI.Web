@@ -1,0 +1,15 @@
+@* Componente reutilizable para tarjetas de información con icono *@
+@model (string Title, string Description, string Icon, string IconColor, string Link)
+
+<a href="@Model.Link" class="sig-card sig-module-card">
+    <div>
+        <div class="sig-module-icon" style="color: @Model.IconColor;">
+            <i class="fa-solid @Model.Icon"></i>
+        </div>
+        <div class="sig-module-title">@Model.Title</div>
+        <div class="sig-module-description">@Model.Description</div>
+    </div>
+    <div style="margin-top: 1rem; color: var(--sig-accent-2); font-size: 0.9rem; font-weight: 600;">
+        Acceder <i class="fa-solid fa-arrow-right ms-2"></i>
+    </div>
+</a>

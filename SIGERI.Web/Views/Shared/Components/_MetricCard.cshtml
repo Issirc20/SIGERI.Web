@@ -1,0 +1,12 @@
+@model dynamic
+<div class="metric-card sig-card" role="group" aria-label="@Model.Label">
+    <div class="metric-left">
+        <div class="metric-desc">@Model.Label</div>
+        <div class="metric-value">@Model.Value</div>
+        @if(Model?.Subtitle != null){ <div class="card-sub">@Model.Subtitle</div> }
+    </div>
+    <div class="metric-right text-end">
+        @if(Model?.Percent != null){ <div class="small text-muted">@Model.Percent% <small class="text-muted">vs previo</small></div> }
+        @if(Model?.Icon != null){ <i data-lucide="@Model.Icon" width="28" height="28"></i> }
+    </div>
+</div>

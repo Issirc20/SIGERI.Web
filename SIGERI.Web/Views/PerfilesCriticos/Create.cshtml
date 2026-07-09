@@ -1,0 +1,354 @@
+@model SIGERI.Application.PerfilesCriticos.Commands.RegistrarPerfilActivoCriticoCommand
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Nuevo Perfil Crítico";
+}
+
+<style>
+    /* PAGE HEADER */
+    .sig-form-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 2rem 0 1.5rem 0;
+        border-bottom: 1px solid var(--sig-dark-border);
+    }
+
+    .sig-form-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .sig-form-title h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--sig-dark-text);
+        margin: 0;
+    }
+
+    .sig-form-title .badge {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .sig-form-desc {
+        color: var(--sig-dark-muted);
+        font-size: 0.95rem;
+    }
+
+    /* FORM CONTAINER */
+    .sig-form-container {
+        background: linear-gradient(180deg, var(--sig-dark-surface) 0%, var(--sig-dark-surface-2) 100%);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.85rem;
+        padding: 2rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    /* FORM GROUPS */
+    .sig-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .sig-form-group label {
+        display: block;
+        color: var(--sig-dark-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sig-form-group .form-control,
+    .sig-form-group .form-select {
+        background: var(--sig-dark-surface-2);
+        border: 1px solid var(--sig-dark-border);
+        color: var(--sig-dark-text);
+        border-radius: 0.6rem;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .sig-form-group .form-control:focus,
+    .sig-form-group .form-select:focus {
+        outline: none;
+        border-color: var(--sig-accent);
+        background: var(--sig-dark-surface);
+        box-shadow: 0 0 12px rgba(93, 63, 160, 0.3);
+    }
+
+    /* FORM ROW */
+    .sig-form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* IMPACT GRID */
+    .impact-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .impact-matrix {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .impact-level {
+        padding: 0.75rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+
+    .impact-level:hover {
+        transform: scale(1.05);
+    }
+
+    .impact-level.low { background: linear-gradient(135deg, #10b981, #059669); }
+    .impact-level.medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .impact-level.high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+    /* ACTIONS */
+    .sig-form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--sig-dark-border);
+    }
+
+    .btn-sig-primary {
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, var(--sig-accent) 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        border-radius: 0.6rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px rgba(93, 63, 160, 0.3);
+    }
+
+    .btn-sig-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(93, 63, 160, 0.4);
+    }
+
+    .btn-sig-secondary {
+        padding: 0.75rem 2rem;
+        background: transparent;
+        color: var(--sig-dark-text);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.6rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sig-secondary:hover {
+        border-color: var(--sig-accent);
+        background: rgba(93, 63, 160, 0.1);
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .sig-form-row, .impact-grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .impact-matrix {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-form-header">
+    <div class="sig-form-title">
+        <h1><i class="fa-solid fa-shield-virus" style="color: #ef4444;"></i> Registrar Perfil Crítico</h1>
+        <span class="badge">ANÁLISIS DE IMPACTO</span>
+    </div>
+    <p class="sig-form-desc">
+        Define el perfil de criticidad y los impactos multidimensionales para un activo crítico.
+    </p>
+</div>
+
+<!-- FORM CONTAINER -->
+<div class="sig-form-container">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- SECTION 1: ASSET -->
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-layer-group" style="color: var(--sig-accent);"></i> Activo Crítico
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="activoId">ID Activo</label>
+                <input type="text" id="activoId" name="activoId" class="form-control" 
+                       value="00000000-0000-0000-0000-000000000001" readonly>
+            </div>
+        </div>
+
+        <!-- SECTION 2: IMPACT DIMENSIONS -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-chart-pie" style="color: var(--sig-accent);"></i> Análisis de Impacto (5D)
+            </h3>
+
+            <!-- Impact Matrix 2x2 -->
+            <div class="impact-grid-2">
+                <!-- 1. Reputación -->
+                <div class="sig-form-group">
+                    <label>⭐ Impacto de Reputación</label>
+                    <select name="impactoReputacion" class="form-select" required>
+                        <option value="">Seleccionar nivel...</option>
+                        @foreach (var nivel in Enum.GetValues<NivelImpactoOctave>())
+                        {
+                            <option value="@nivel">@nivel.ToString() - @GetImpactDescription(nivel)</option>
+                        }
+                    </select>
+                    <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                        Daño a imagen, confianza de clientes
+                    </small>
+                </div>
+
+                <!-- 2. Financiero -->
+                <div class="sig-form-group">
+                    <label>💰 Impacto Financiero</label>
+                    <select name="impactoFinanciero" class="form-select" required>
+                        <option value="">Seleccionar nivel...</option>
+                        @foreach (var nivel in Enum.GetValues<NivelImpactoOctave>())
+                        {
+                            <option value="@nivel">@nivel.ToString() - @GetImpactDescription(nivel)</option>
+                        }
+                    </select>
+                    <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                        Pérdidas económicas directas
+                    </small>
+                </div>
+
+                <!-- 3. Productividad -->
+                <div class="sig-form-group">
+                    <label>📈 Impacto de Productividad</label>
+                    <select name="impactoProductividad" class="form-select" required>
+                        <option value="">Seleccionar nivel...</option>
+                        @foreach (var nivel in Enum.GetValues<NivelImpactoOctave>())
+                        {
+                            <option value="@nivel">@nivel.ToString() - @GetImpactDescription(nivel)</option>
+                        }
+                    </select>
+                    <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                        Reducción de operatividad
+                    </small>
+                </div>
+
+                <!-- 4. Legal -->
+                <div class="sig-form-group">
+                    <label>⚖️ Impacto Legal</label>
+                    <select name="impactoLegal" class="form-select" required>
+                        <option value="">Seleccionar nivel...</option>
+                        @foreach (var nivel in Enum.GetValues<NivelImpactoOctave>())
+                        {
+                            <option value="@nivel">@nivel.ToString() - @GetImpactDescription(nivel)</option>
+                        }
+                    </select>
+                    <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                        Incumplimiento normativo
+                    </small>
+                </div>
+            </div>
+
+            <!-- 5. SSOMA -->
+            <div class="sig-form-group" style="margin-top: 1.5rem;">
+                <label>👥 Impacto Seguridad / SSOMA</label>
+                <select name="impactoSeguridadSsoma" class="form-select" required>
+                    <option value="">Seleccionar nivel...</option>
+                    @foreach (var nivel in Enum.GetValues<NivelImpactoOctave>())
+                    {
+                        <option value="@nivel">@nivel.ToString() - @GetImpactDescription(nivel)</option>
+                    }
+                </select>
+                <small style="color: var(--sig-dark-muted); display: block; margin-top: 0.25rem;">
+                    Riesgo para salud y seguridad
+                </small>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CONTAINERS -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-boxes" style="color: var(--sig-accent);"></i> Contenedores
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="contenedoresTecnicos">🔧 Contenedores Técnicos</label>
+                <textarea id="contenedoresTecnicos" name="contenedoresTecnicos" class="form-control" rows="2"
+                          placeholder="Sistemas, infraestructura, aplicaciones..."></textarea>
+            </div>
+
+            <div class="sig-form-group">
+                <label for="contenedoresFisicos">🏢 Contenedores Físicos</label>
+                <textarea id="contenedoresFisicos" name="contenedoresFisicos" class="form-control" rows="2"
+                          placeholder="Ubicaciones, instalaciones, edificios..."></textarea>
+            </div>
+
+            <div class="sig-form-group">
+                <label for="contenedoresHumanos">👕 Contenedores Humanos</label>
+                <textarea id="contenedoresHumanos" name="contenedoresHumanos" class="form-control" rows="2"
+                          placeholder="Roles, personas, equipos responsables..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 4: AUDIT -->
+        <div style="padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-clock" style="color: var(--sig-accent);"></i> Auditoría
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="creadoPor">Creado por</label>
+                <input type="text" id="creadoPor" name="creadoPor" class="form-control" value="sistema" readonly>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="sig-form-actions">
+            <button type="submit" class="btn-sig-primary">
+                <i class="fa-solid fa-save"></i> Guardar Perfil
+            </button>
+            <a asp-action="Index" class="btn-sig-secondary">
+                <i class="fa-solid fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+@functions {
+    private string GetImpactDescription(NivelImpactoOctave nivel) {
+        return nivel switch {
+            NivelImpactoOctave.Bajo => "Bajo impacto",
+            NivelImpactoOctave.Medio => "Impacto moderado",
+            NivelImpactoOctave.Alto => "Alto impacto",
+            _ => "Desconocido"
+        };
+    }
+}

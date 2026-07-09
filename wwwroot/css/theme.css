@@ -1,0 +1,158 @@
+/* Design System - theme.css
+   Fase 1: variables, tipografía e estilos base.
+*/
+:root{
+    --primary: #7c4dff; /* main */
+    --primary-2: #b88cff; /* secondary */
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+
+    --bg: #fbfaff; /* fondo */
+    --panel: #ffffff; /* paneles */
+    --card: #ffffff; /* cards */
+
+    --text: #1f1633; /* texto principal */
+    --muted: #6f627f; /* texto secundario */
+
+    --sig-dark-bg: var(--bg);
+    --sig-dark-surface: var(--panel);
+    --sig-dark-surface-2: #f6f0ff;
+    --sig-dark-border: rgba(124, 77, 255, 0.10);
+    --sig-dark-text: var(--text);
+    --sig-dark-muted: var(--muted);
+    --sig-accent: var(--primary);
+    --sig-accent-hover: #6b3fe0;
+    --sig-accent-2: var(--primary-2);
+    --sig-blue: #5b8cff;
+
+    --radius-lg: 12px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+
+    --shadow-soft: 0 8px 24px rgba(100, 69, 180, 0.08);
+    --shadow-sm: 0 6px 18px rgba(100, 69, 180, 0.08);
+
+    --gap: 1rem;
+}
+
+/* Light theme tokens (CSS variables will be toggled via JS) */
+:root.light {
+    --bg: #fbfaff;
+    --panel: #ffffff;
+    --card: #ffffff;
+    --text: #1f1633;
+    --muted: #6f627f;
+    --sig-dark-bg: var(--bg);
+    --sig-dark-surface: var(--panel);
+    --sig-dark-surface-2: #f6f0ff;
+    --sig-dark-border: rgba(124, 77, 255, 0.10);
+    --sig-dark-text: var(--text);
+    --sig-dark-muted: var(--muted);
+}
+
+/* Base */
+html,body{
+    height:100%;
+}
+body{
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    background: linear-gradient(135deg, #fbfaff 0%, #ffffff 48%, #f6f0ff 100%);
+    color: var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    margin:0;
+}
+
+a{color:var(--primary);}
+
+/* Layout utilities */
+.container-fluid.sig{padding:1.5rem 2rem}
+
+/* Sidebar (base) - keep existing selectors, enhance progressively */
+.sig-sidebar{
+    background: linear-gradient(180deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 10% , black 5%));
+    border-right: 1px solid rgba(255,255,255,0.03);
+    box-shadow: var(--shadow-sm);
+    padding:1.25rem 0.75rem;
+    border-radius:0 14px 14px 0;
+}
+
+.sig-sidebar .sig-sidebar-logo{font-weight:800; color:var(--text);}
+
+/* Cards */
+.sig-card, .sig-panel, .sig-shell, .modal-content{
+    background: linear-gradient(180deg, var(--card) 0%, color-mix(in srgb, var(--card), black 6%));
+    border: none;
+    box-shadow: var(--shadow-soft);
+    border-radius: var(--radius-lg);
+}
+
+/* Stat / KPI */
+.stat-card{
+    padding:1rem 1.25rem;
+    border-radius:var(--radius-md);
+    display:flex;
+    align-items:center;
+    gap:1rem;
+}
+
+.stat-card .value{font-size:1.5rem;font-weight:700;color:var(--text);}
+.stat-card .label{font-size:0.85rem;color:var(--muted)}
+
+/* Buttons */
+.btn-sig{
+    background: linear-gradient(90deg,var(--primary),var(--primary-2));
+    color:#fff;border:0;padding:0.5rem 0.9rem;border-radius:10px;font-weight:700;
+    box-shadow: 0 8px 18px rgba(124, 77, 255, 0.18);
+}
+
+/* Focus visible */
+:focus{outline: 2px solid color-mix(in srgb, var(--primary) 28%, transparent); outline-offset:3px}
+
+/* Responsive helpers */
+@media (max-width: 768px){
+    .container-fluid.sig{padding:1rem}
+}
+
+/* Small utilities to be extended later */
+.hidden{display:none}
+.flex{display:flex}
+.center{display:flex;align-items:center}
+
+/* Sidebar enhancements */
+.sig-sidebar{width:var(--sig-sidebar-width);transition:width 0.32s cubic-bezier(.2,.9,.2,1);overflow:hidden}
+.sig-sidebar.collapsed{width:var(--sig-sidebar-collapsed)}
+.sig-sidebar .sig-nav-group{padding:0.25rem 0.25rem;margin-bottom:0.5rem}
+.sig-nav-group-title{font-size:0.75rem;color:var(--muted);text-transform:uppercase;padding:0.5rem 0.5rem}
+.sig-nav-item{padding:0.15rem 0.25rem}
+.sig-nav-link{display:flex;align-items:center;gap:0.75rem;padding:0.6rem;border-radius:8px;color:var(--muted);text-decoration:none}
+.sig-nav-link i, .sig-nav-link svg{min-width:20px}
+.sig-nav-link:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--primary), transparent 85%), color-mix(in srgb,var(--primary-2), transparent 90%));color:#fff;box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.sig-nav-link.active{color:#fff;box-shadow:inset 4px 0 0 var(--primary);background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+
+.sig-sidebar-footer{padding:1rem 0.5rem}
+.sig-user-compact img{border-radius:8px}
+
+/* Topbar styles */
+.sig-topbar{padding:0.6rem 1.25rem;gap:1rem;background:transparent;border-bottom:1px solid rgba(255,255,255,0.02)}
+.sig-topbar .input-group .form-control{background:transparent;color:var(--muted);border-radius:10px}
+.sig-topbar .input-group-text{background:transparent;border:0;color:var(--muted)}
+
+/* Breadcrumb */
+.breadcrumb{background:transparent;color:var(--muted)}
+.breadcrumb a{color:var(--muted)}
+
+/* Notification badge tweaks */
+.badge.bg-danger{background:var(--danger);color:#fff}
+
+/* Responsive */
+@media (max-width: 768px){
+    .sig-sidebar{position:fixed;z-index:1100}
+    .sig-layout-wrapper{margin-left:0}
+    footer{margin-left:0}
+}
+
+/* Accessibility tweaks */
+button[aria-expanded]{cursor:pointer}

@@ -1,0 +1,303 @@
+@using SIGERI.Domain.Enums
+@model IReadOnlyCollection<SIGERI.Application.DTOs.PerfilActivoCriticoDto>
+@{
+    ViewData["Title"] = "Perfiles Críticos";
+}
+
+<style>
+    .sig-profiles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .sig-profile-card {
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+        background: linear-gradient(180deg, #ffffff 0%, #fbf7ff 100%);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.85rem;
+        box-shadow: 0 20px 50px rgba(124, 77, 255, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sig-profile-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 30px 60px rgba(124, 77, 255, 0.12);
+        border-color: var(--sig-accent);
+    }
+
+    .sig-profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--sig-dark-border);
+    }
+
+    .sig-profile-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--sig-accent) 0%, var(--sig-accent-hover) 100%);
+        border-radius: 0.75rem;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .sig-profile-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--sig-dark-text);
+    }
+
+    .sig-impact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .sig-impact-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sig-impact-label {
+        color: var(--sig-dark-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.4rem;
+    }
+
+    .sig-impact-value {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .sig-impact-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .sig-impact-badge.critical {
+        background: #dc3545;
+    }
+
+    .sig-impact-badge.high {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .sig-impact-badge.medium {
+        background: #ff9f40;
+    }
+
+    .sig-impact-badge.low {
+        background: #4caf50;
+    }
+
+    @@media (max-width: 768px) {
+        .sig-profiles-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .sig-impact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sig-profile-card {
+            padding: 1rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .sig-profiles-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sig-profile-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .sig-profile-name {
+            font-size: 1rem;
+        }
+
+        .sig-impact-label {
+            font-size: 0.7rem;
+        }
+
+        .sig-impact-value {
+            font-size: 0.85rem;
+        }
+
+        .sig-impact-badge {
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <span class="badge" style="width: fit-content; background: rgba(76, 175, 80, 0.2); color: #66bb6a; border: 1px solid rgba(76, 175, 80, 0.4); padding: 0.5rem 1rem; border-radius: 999px;">
+            OCTAVE ALLEGRO
+        </span>
+        <div class="sig-page-subtitle">
+            <i class="fa-solid fa-layer-group"></i>
+            Perfilado de Activos Críticos
+        </div>
+        <p class="sig-page-desc">
+            Impacto multidimensional y contenedores de información según OCTAVE Allegro.
+        </p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Create" class="btn btn-sig">
+            <i class="fa-solid fa-plus me-2"></i>Nuevo Perfil
+        </a>
+    </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="sig-stats-row">
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Total Perfiles</div>
+        <div class="sig-stat-value">@Model.Count</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Críticos</div>
+        <div class="sig-stat-value" style="color: #ff6b7a;">
+            @Model.Count(p => p.ImpactoReputacion == NivelImpactoOctave.Alto || p.ImpactoFinanciero == NivelImpactoOctave.Alto || p.ImpactoProductividad == NivelImpactoOctave.Alto)
+        </div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">En Evaluación</div>
+        <div class="sig-stat-value" style="color: #ffc107;">@((Model.Count / 2))</div>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<div class="sig-controls-bar">
+    <div class="sig-search-box">
+        <i class="fa-solid fa-search sig-search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre de activo...">
+    </div>
+</div>
+
+<!-- PROFILES GRID -->
+@if (Model.Any())
+{
+    <div class="sig-profiles-grid">
+        @foreach (var item in Model)
+        {
+            <div class="sig-profile-card" data-name="@item.Activo.ToLower()">
+                <div class="sig-profile-header">
+                    <div class="sig-profile-icon">
+                        <i class="fa-solid fa-shield"></i>
+                    </div>
+                    <div class="sig-profile-name">@item.Activo</div>
+                </div>
+
+                <div class="sig-impact-grid">
+                    <div class="sig-impact-item">
+                        <span class="sig-impact-label">
+                            <i class="fa-solid fa-star me-1"></i>Reputación
+                        </span>
+                        <div class="sig-impact-value">
+                            <span class="sig-impact-badge critical">@item.ImpactoReputacion</span>
+                            /5
+                        </div>
+                    </div>
+
+                    <div class="sig-impact-item">
+                        <span class="sig-impact-label">
+                            <i class="fa-solid fa-dollar-sign me-1"></i>Financiero
+                        </span>
+                        <div class="sig-impact-value">
+                            <span class="sig-impact-badge high">@item.ImpactoFinanciero</span>
+                            /5
+                        </div>
+                    </div>
+
+                    <div class="sig-impact-item">
+                        <span class="sig-impact-label">
+                            <i class="fa-solid fa-chart-line me-1"></i>Productividad
+                        </span>
+                        <div class="sig-impact-value">
+                            <span class="sig-impact-badge medium">@item.ImpactoProductividad</span>
+                            /5
+                        </div>
+                    </div>
+
+                    <div class="sig-impact-item">
+                        <span class="sig-impact-label">
+                            <i class="fa-solid fa-scale-balanced me-1"></i>Legal
+                        </span>
+                        <div class="sig-impact-value">
+                            <span class="sig-impact-badge medium">@item.ImpactoLegal</span>
+                            /5
+                        </div>
+                    </div>
+
+                    <div class="sig-impact-item">
+                        <span class="sig-impact-label">
+                            <i class="fa-solid fa-people-group me-1"></i>SSOMA
+                        </span>
+                        <div class="sig-impact-value">
+                            <span class="sig-impact-badge low">@item.ImpactoSeguridadSsoma</span>
+                            /5
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="sig-card sig-empty-state">
+        <div class="sig-empty-icon">
+            <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div class="sig-empty-title">No hay perfiles críticos registrados</div>
+        <p>Crea tu primer perfil crítico para mapear el impacto multidimensional de activos.</p>
+        <a asp-action="Create" class="btn btn-sig mt-3">
+            <i class="fa-solid fa-plus me-2"></i>Crear Perfil Crítico
+        </a>
+    </div>
+}
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const profileCards = document.querySelectorAll('.sig-profile-card');
+
+    searchInput?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        profileCards.forEach(card => {
+            const name = card.dataset.name;
+            card.style.display = name.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>

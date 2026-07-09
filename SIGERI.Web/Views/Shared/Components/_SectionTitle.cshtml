@@ -1,0 +1,46 @@
+@model dynamic
+@{
+    // Mirror of Views/Shared/_SectionTitle.cshtml for component path compatibility
+    string? title = null;
+    string? icon = null;
+    string? subtitle = null;
+    string? badge = null;
+    string? badgeBg = null;
+    string? badgeColor = null;
+
+    if (Model != null)
+    {
+        var t = Model.GetType();
+
+        var pTitle = t.GetProperty("Title");
+        if (pTitle != null) title = pTitle.GetValue(Model)?.ToString();
+
+        var pIcon = t.GetProperty("Icon");
+        if (pIcon != null) icon = pIcon.GetValue(Model)?.ToString();
+
+        var pSubtitle = t.GetProperty("Subtitle");
+        if (pSubtitle != null) subtitle = pSubtitle.GetValue(Model)?.ToString();
+
+        var pBadge = t.GetProperty("Badge");
+        if (pBadge != null) badge = pBadge.GetValue(Model)?.ToString();
+
+        var pBadgeBg = t.GetProperty("BadgeBg");
+        if (pBadgeBg != null) badgeBg = pBadgeBg.GetValue(Model)?.ToString();
+
+        var pBadgeColor = t.GetProperty("BadgeColor");
+        if (pBadgeColor != null) badgeColor = pBadgeColor.GetValue(Model)?.ToString();
+    }
+}
+
+<div class="sig-section-header">
+    <div>
+        <div class="sig-section-title">
+            @if(!string.IsNullOrEmpty(icon)){ <i data-lucide="@icon"></i> }
+            @(title ?? "")
+        </div>
+        @if(!string.IsNullOrEmpty(subtitle)){ <div class="sig-section-subtitle">@(subtitle)</div> }
+    </div>
+    @if(!string.IsNullOrEmpty(badge)){
+        <span class="badge" style="background: @(badgeBg ?? "transparent"); color: @(badgeColor ?? "var(--primary)"); border: 1px solid rgba(255,255,255,0.04); padding: 0.5rem 1rem; border-radius:999px;">@badge</span>
+    }
+</div>

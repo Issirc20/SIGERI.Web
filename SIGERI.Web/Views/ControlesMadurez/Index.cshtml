@@ -1,0 +1,242 @@
+@model IReadOnlyCollection<SIGERI.Application.DTOs.ControlMadurezDto>
+@{
+    ViewData["Title"] = "Controles de Madurez";
+}
+
+<style>
+    .sig-code {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--sig-accent-2);
+    }
+
+    .sig-control-name {
+        font-weight: 600;
+        color: var(--sig-dark-text);
+    }
+
+    .sig-function-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .sig-level-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .sig-level-0 {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b7a;
+    }
+
+    .sig-level-1 {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .sig-level-2 {
+        background: rgba(255, 159, 64, 0.2);
+        color: #ff9f40;
+    }
+
+    .sig-level-3 {
+        background: rgba(76, 175, 80, 0.2);
+        color: #66bb6a;
+    }
+
+    .sig-level-4 {
+        background: rgba(58, 134, 255, 0.2);
+        color: #3a86ff;
+    }
+
+    .sig-gap {
+        font-weight: 700;
+        color: var(--sig-accent-2);
+        text-align: center;
+    }
+
+    .sig-gap-high {
+        color: #ff6b7a;
+    }
+
+    .sig-gap-medium {
+        color: #ffc107;
+    }
+
+    .sig-gap-low {
+        color: #66bb6a;
+    }
+
+    @@media (max-width: 480px) {
+        .sig-code {
+            font-size: 0.75rem;
+        }
+
+        .sig-control-name {
+            font-size: 0.8rem;
+        }
+
+        .sig-function-badge,
+        .sig-level-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            min-width: 28px;
+            height: 28px;
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <span class="badge" style="width: fit-content; background: rgba(220, 53, 69, 0.2); color: #ff6b7a; border: 1px solid rgba(220, 53, 69, 0.4); padding: 0.5rem 1rem; border-radius: 999px;">
+            NIST CSF 2.0 / CIS v8
+        </span>
+        <div class="sig-page-subtitle">
+            <i class="fa-solid fa-signal"></i>
+            Diagnóstico de Madurez
+        </div>
+        <p class="sig-page-desc">
+            Control actual, objetivo y brecha por función con análisis de madurez.
+        </p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Create" class="btn btn-sig">
+            <i class="fa-solid fa-plus me-2"></i>Nuevo Control
+        </a>
+    </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="sig-stats-row">
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Total Controles</div>
+        <div class="sig-stat-value">@Model.Count</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Promedio Actual</div>
+        <div class="sig-stat-value" style="color: #ffc107;">
+            @(Model.Count > 0 ? Math.Round(Model.Average(m => m.NivelActual), 1).ToString("0.0") : "0.0")
+        </div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Promedio Objetivo</div>
+        <div class="sig-stat-value" style="color: #66bb6a;">
+            @(Model.Count > 0 ? Math.Round(Model.Average(m => m.NivelObjetivo), 1).ToString("0.0") : "0.0")
+        </div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Brecha Promedio</div>
+        <div class="sig-stat-value" style="color: #ff6b7a;">
+            @(Model.Count > 0 ? Math.Round(Model.Average(m => m.NivelObjetivo - m.NivelActual), 1).ToString("0.0") : "0.0")
+        </div>
+    </div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div class="sig-controls-bar">
+    <div class="sig-search-box">
+        <i class="fa-solid fa-search sig-search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por código, nombre o función...">
+    </div>
+</div>
+
+<!-- TABLE -->
+@if (Model.Any())
+{
+    <div class="sig-table-wrapper">
+        <table class="sig-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Función</th>
+                    <th>Nivel Actual</th>
+                    <th>Nivel Objetivo</th>
+                    <th>Brecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var brecha = item.NivelObjetivo - item.NivelActual;
+                    var brechaClass = brecha >= 2 ? "sig-gap-high" : brecha >= 1 ? "sig-gap-medium" : "sig-gap-low";
+
+                    var actualLevelClass = item.NivelActual == 0 ? "sig-level-0"
+                        : item.NivelActual == 1 ? "sig-level-1"
+                        : item.NivelActual == 2 ? "sig-level-2"
+                        : item.NivelActual == 3 ? "sig-level-3"
+                        : "sig-level-4";
+
+                    var objetivoLevelClass = item.NivelObjetivo == 0 ? "sig-level-0"
+                        : item.NivelObjetivo == 1 ? "sig-level-1"
+                        : item.NivelObjetivo == 2 ? "sig-level-2"
+                        : item.NivelObjetivo == 3 ? "sig-level-3"
+                        : "sig-level-4";
+
+                    <tr>
+                        <td>
+                            <span class="sig-code">@item.Codigo</span>
+                        </td>
+                        <td>
+                            <span class="sig-control-name">@item.Nombre</span>
+                        </td>
+                        <td>
+                            <span class="sig-function-badge">@item.Funcion</span>
+                        </td>
+                        <td>
+                            <span class="sig-level-badge @actualLevelClass">@item.NivelActual</span>
+                        </td>
+                        <td>
+                            <span class="sig-level-badge @objetivoLevelClass">@item.NivelObjetivo</span>
+                        </td>
+                        <td>
+                            <span class="sig-gap @brechaClass">@brecha</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="sig-card sig-empty-state">
+        <div class="sig-empty-icon">
+            <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div class="sig-empty-title">No hay controles de madurez registrados</div>
+        <p>Comienza registrando controles según NIST CSF 2.0 o CIS v8 para mapear la madurez.</p>
+        <a asp-action="Create" class="btn btn-sig mt-3">
+            <i class="fa-solid fa-plus me-2"></i>Crear Primer Control
+        </a>
+    </div>
+}
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('.sig-table tbody tr');
+
+    searchInput?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>

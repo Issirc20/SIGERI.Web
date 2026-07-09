@@ -1,0 +1,11 @@
+@model dynamic
+<div class="timeline-item d-flex gap-3 align-items-start">
+    <div class="timeline-marker">
+        <i data-lucide="@Model.Icon" width="18" height="18"></i>
+    </div>
+    <div class="timeline-body">
+        <div class="small fw-bold">@Model.Title <span class="text-muted small">@Model.User</span></div>
+        <div class="small text-muted">@Model.Description</div>
+        <div class="small text-muted">@Model.Date</div>
+    </div>
+</div>

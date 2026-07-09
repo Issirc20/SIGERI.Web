@@ -1,0 +1,16 @@
+@model dynamic
+<div class="dashboard-card sig-card">
+    <div class="card-header">
+        <div>
+            <div class="card-title">@Model.Title</div>
+            @if(Model?.Subtitle != null){ <div class="card-sub">@Model.Subtitle</div> }
+        </div>
+        <div class="card-actions">
+            @if(Model?.Actions != null){ @Html.Raw(Model.Actions) }
+        </div>
+    </div>
+    <div class="card-body">
+        @RenderSection("CardBody", required: false)
+        @if(Model?.Body != null){ @Html.Raw(Model.Body) }
+    </div>
+</div>

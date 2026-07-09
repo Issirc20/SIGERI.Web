@@ -1,0 +1,42 @@
+@model IEnumerable<SIGERI.Web.ViewModels.Analytics.RecentActivityDto>
+
+<div class="activity-timeline">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var act in Model)
+        {
+            var (icon, colorClass) = act.Type switch
+            {
+                "Asset" => ("server", "activity-item--asset"),
+                "Evaluation" => ("clipboard-check", "activity-item--evaluation"),
+                "Treatment" => ("shield", "activity-item--treatment"),
+                "Risk" => ("alert-triangle", "activity-item--risk"),
+                _ => ("activity", "activity-item--neutral")
+            };
+
+            <div class="activity-item @colorClass">
+                <div class="activity-icon-wrapper">
+                    <i data-lucide="@icon" class="activity-icon"></i>
+                </div>
+                <div class="activity-content">
+                    <p class="activity-description">@act.Description</p>
+                    <div class="activity-meta">
+                        <span class="activity-user">
+                            <i data-lucide="user" class="meta-icon"></i> @act.User
+                        </span>
+                        <span class="activity-time" title="@act.Date.ToString("o")">
+                            <i data-lucide="clock" class="meta-icon"></i> @act.Date.ToString("yyyy-MM-dd HH:mm")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center text-muted py-4">
+            <i data-lucide="clock" class="empty-icon mb-2"></i>
+            <div>No hay actividad reciente registrada</div>
+        </div>
+    }
+</div>

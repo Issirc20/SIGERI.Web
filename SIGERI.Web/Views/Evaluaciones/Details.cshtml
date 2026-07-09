@@ -1,0 +1,57 @@
+@model SIGERI.Application.DTOs.EvaluacionDto
+@{
+    ViewData["Title"] = "Detalle de Evaluación";
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <div class="sig-page-subtitle"><i class="fa-solid fa-clipboard-list"></i> Detalle de Evaluación</div>
+        <p class="sig-page-desc">Activo: <strong>@Model.ActivoNombre</strong> — Responsable: <strong>@Model.UsuarioNombre</strong></p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sig"><i class="fa-solid fa-pen me-1"></i>Editar</a>
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="sig-card p-3 h-100">
+            <h6 class="fw-bold mb-3 text-uppercase" style="color:var(--sig-accent-2);font-size:.75rem;letter-spacing:.1em">
+                <i class="fa-solid fa-info-circle me-2"></i>Información General
+            </h6>
+            <dl class="row mb-0">
+                <dt class="col-sm-5 text-muted small">Fecha</dt>
+                <dd class="col-sm-7 fw-semibold">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dt class="col-sm-5 text-muted small">Activo</dt>
+                <dd class="col-sm-7 fw-semibold">@Model.ActivoNombre</dd>
+                <dt class="col-sm-5 text-muted small">Responsable</dt>
+                <dd class="col-sm-7 fw-semibold">@Model.UsuarioNombre</dd>
+                <dt class="col-sm-5 text-muted small">Total Riesgos</dt>
+                <dd class="col-sm-7">
+                    <span class="badge" style="background:@(Model.TotalRiesgos>0?"rgba(239,68,68,.2)":"rgba(16,185,129,.2)");color:@(Model.TotalRiesgos>0?"#ef4444":"#10b981")">
+                        @Model.TotalRiesgos riesgo(s)
+                    </span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="sig-card p-3 h-100">
+            <h6 class="fw-bold mb-3 text-uppercase" style="color:var(--sig-accent-2);font-size:.75rem;letter-spacing:.1em">
+                <i class="fa-solid fa-comment me-2"></i>Observaciones
+            </h6>
+            <p style="white-space:pre-wrap;color:var(--sig-dark-text)">@Model.Observaciones</p>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+          onsubmit="return confirm('¿Está seguro de eliminar esta evaluación?')">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-danger">
+            <i class="fa-solid fa-trash me-1"></i>Eliminar
+        </button>
+    </form>
+</div>

@@ -1,0 +1,279 @@
+@model SIGERI.Application.Activos.Commands.RegistrarActivoCommand
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Nuevo Activo";
+}
+
+<style>
+    /* PAGE HEADER */
+    .sig-form-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 2rem 0 1.5rem 0;
+        border-bottom: 1px solid var(--sig-dark-border);
+    }
+
+    .sig-form-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .sig-form-title h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--sig-dark-text);
+        margin: 0;
+    }
+
+    .sig-form-title .badge {
+        background: linear-gradient(135deg, var(--sig-accent) 0%, var(--sig-accent-2) 100%);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .sig-form-desc {
+        color: var(--sig-dark-muted);
+        font-size: 0.95rem;
+    }
+
+    /* FORM CONTAINER */
+    .sig-form-container {
+        background: linear-gradient(180deg, var(--sig-dark-surface) 0%, var(--sig-dark-surface-2) 100%);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.85rem;
+        padding: 2rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    /* FORM GROUPS */
+    .sig-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .sig-form-group label {
+        display: block;
+        color: var(--sig-dark-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        text-transform: capitalize;
+    }
+
+    .sig-form-group .form-control,
+    .sig-form-group .form-select {
+        background: var(--sig-dark-surface-2);
+        border: 1px solid var(--sig-dark-border);
+        color: var(--sig-dark-text);
+        border-radius: 0.6rem;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .sig-form-group .form-control:focus,
+    .sig-form-group .form-select:focus {
+        outline: none;
+        border-color: var(--sig-accent);
+        background: var(--sig-dark-surface);
+        box-shadow: 0 0 12px rgba(93, 63, 160, 0.3);
+    }
+
+    .sig-form-group .form-control::placeholder {
+        color: var(--sig-dark-muted);
+    }
+
+    /* FORM ROW */
+    .sig-form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* ACTIONS */
+    .sig-form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--sig-dark-border);
+    }
+
+    .btn-sig-primary {
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, var(--sig-accent) 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        border-radius: 0.6rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px rgba(93, 63, 160, 0.3);
+    }
+
+    .btn-sig-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(93, 63, 160, 0.4);
+    }
+
+    .btn-sig-secondary {
+        padding: 0.75rem 2rem;
+        background: transparent;
+        color: var(--sig-dark-text);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.6rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sig-secondary:hover {
+        border-color: var(--sig-accent);
+        background: rgba(93, 63, 160, 0.1);
+        color: var(--sig-accent-2);
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .sig-form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .sig-form-container {
+            padding: 1.5rem;
+        }
+
+        .sig-form-title h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-form-header">
+    <div class="sig-form-title">
+        <h1><i class="fa-solid fa-plus-circle" style="color: var(--sig-accent);"></i> Registrar Activo</h1>
+        <span class="badge">MAGERIT v3</span>
+    </div>
+    <p class="sig-form-desc">
+        Crea un nuevo activo tecnológico, organizacional u operativo en el inventario.
+    </p>
+</div>
+
+<!-- FORM CONTAINER -->
+<div class="sig-form-container">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- SECTION 1: IDENTIFICATION -->
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-tag" style="color: var(--sig-accent);"></i> Identificación
+            </h3>
+
+            <div class="sig-form-row">
+                <div class="sig-form-group">
+                    <label for="codigo">Código</label>
+                    <input type="text" id="codigo" name="codigo" class="form-control" placeholder="ACT-001" required>
+                </div>
+                <div class="sig-form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Servidor de Aplicaciones" required>
+                </div>
+            </div>
+
+            <div class="sig-form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" class="form-control" rows="3" placeholder="Detalle del activo..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION 2: CLASSIFICATION -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-sitemap" style="color: var(--sig-accent);"></i> Clasificación
+            </h3>
+
+            <div class="sig-form-row">
+                <div class="sig-form-group">
+                    <label for="tipoActivo">Tipo</label>
+                    <select id="tipoActivo" name="tipoActivo" class="form-select" required>
+                        <option value="">Selecionar tipo...</option>
+                        @foreach (var tipo in Enum.GetValues<TipoActivo>())
+                        {
+                            <option value="@tipo">@tipo.ToString().Replace("_", " ")</option>
+                        }
+                    </select>
+                </div>
+                <div class="sig-form-group">
+                    <label for="criticidad">Criticidad</label>
+                    <select id="criticidad" name="criticidad" class="form-select" required>
+                        <option value="">Seleccionar nivel...</option>
+                        @foreach (var crit in Enum.GetValues<Criticidad>())
+                        {
+                            <option value="@crit">@crit.ToString()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: OWNERSHIP -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-user-tie" style="color: var(--sig-accent);"></i> Responsabilidad
+            </h3>
+
+            <div class="sig-form-row">
+                <div class="sig-form-group">
+                    <label for="propietario">Propietario</label>
+                    <input type="text" id="propietario" name="propietario" class="form-control" placeholder="Nombre del responsable">
+                </div>
+                <div class="sig-form-group">
+                    <label for="ubicacion">Ubicación</label>
+                    <input type="text" id="ubicacion" name="ubicacion" class="form-control" placeholder="Sede o localización">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: ORGANIZATION -->
+        <div style="margin-bottom: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-building" style="color: var(--sig-accent);"></i> Organización
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="organizacionId">ID Organización</label>
+                <input type="text" id="organizacionId" name="organizacionId" class="form-control" value="00000000-0000-0000-0000-000000000001" readonly>
+            </div>
+        </div>
+
+        <!-- SECTION 5: AUDIT -->
+        <div style="padding-top: 1.5rem; border-top: 1px solid var(--sig-dark-border);">
+            <h3 style="color: var(--sig-dark-text); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-clock" style="color: var(--sig-accent);"></i> Auditoría
+            </h3>
+
+            <div class="sig-form-group">
+                <label for="creadoPor">Creado por</label>
+                <input type="text" id="creadoPor" name="creadoPor" class="form-control" value="sistema" readonly>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="sig-form-actions">
+            <button type="submit" class="btn-sig-primary">
+                <i class="fa-solid fa-save"></i> Guardar Activo
+            </button>
+            <a asp-action="Index" class="btn-sig-secondary">
+                <i class="fa-solid fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,20 @@
+@* Componente reutilizable para tarjeta de madurez NIST *@
+@model (string Name, decimal Score, decimal Target)
+
+@{
+    var percent = Math.Round((Model.Score / Model.Target) * 100m, 0);
+}
+
+<div class="sig-card sig-nist-card">
+    <div class="sig-nist-header">
+        <span class="sig-nist-name">@Model.Name</span>
+        <span class="sig-nist-score">@Model.Score.ToString("0.0")/@Model.Target.ToString("0.0")</span>
+    </div>
+    <div class="sig-progress-bar">
+        <div class="sig-progress-fill" style="width: @percent%;"></div>
+    </div>
+    <div class="sig-progress-footer">
+        <span>Brecha: @((Model.Target - Model.Score).ToString("0.0"))</span>
+        <span>@percent% completado</span>
+    </div>
+</div>

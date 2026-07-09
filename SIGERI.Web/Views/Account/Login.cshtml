@@ -1,0 +1,585 @@
+@model SIGERI.Web.Controllers.AccountController.LoginInputModel
+@{
+    Layout = null;
+    ViewData["Title"] = "SIGERI — Inicio de Sesión";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark only" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU90FeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --sig-bg: #0a0e16;
+            --sig-surface: #131821;
+            --sig-surface-2: #0f131b;
+            --sig-border: rgba(255, 255, 255, 0.06);
+            --sig-text: #f5f7fa;
+            --sig-text-secondary: #a8b2c1;
+            --sig-accent: #8b2151;
+            --sig-accent-hover: #b0286d;
+            --sig-focus: rgba(139, 33, 81, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--sig-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #06080d 0%, #0c101a 50%, #08090f 100%);
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(rgba(255,255,255,.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.01) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            width: min(100%, 420px);
+            position: relative;
+            z-index: 10;
+            margin-inline: auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.475rem 0.95rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(139, 33, 81, 0.25);
+            background: rgba(139, 33, 81, 0.08);
+            color: #d8a6c2;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #d8a6c2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: var(--sig-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .login-card {
+            position: relative;
+            background: linear-gradient(180deg, var(--sig-surface) 0%, var(--sig-surface-2) 100%);
+            border: 1px solid var(--sig-border);
+            border-radius: 1.375rem;
+            box-shadow: 
+                0 25px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                0 0 40px rgba(139, 33, 81, 0.08);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header-section {
+            padding: 2.25rem 2.25rem 1.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+        }
+
+        .system-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(139, 33, 81, 0.15), rgba(176, 40, 109, 0.08));
+            border: 1px solid rgba(139, 33, 81, 0.2);
+            margin: 0 auto 1.25rem;
+            font-size: 1.75rem;
+            color: #d8a6c2;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .system-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f5f7fa;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.2px;
+        }
+
+        .system-desc {
+            font-size: 0.8rem;
+            color: var(--sig-text-secondary);
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .form-section {
+            padding: 2.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #d8a6c2;
+            margin-bottom: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.25rem;
+            color: #d8a6c2;
+            font-size: 0.95rem;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .input-wrapper:focus-within .input-icon {
+            opacity: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(10, 14, 22, 0.5) !important;
+            color: #f5f7fa !important;
+            border: 1.5px solid var(--sig-border) !important;
+            border-radius: 0.875rem;
+            padding: 0.85rem 1.1rem 0.85rem 2.95rem !important;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.4;
+        }
+
+        .form-control::placeholder {
+            color: #6b758a;
+            font-weight: 400;
+        }
+
+        .form-control:hover:not(:focus) {
+            border-color: rgba(139, 33, 81, 0.15);
+        }
+
+        .form-control:focus {
+            background: rgba(10, 14, 22, 0.8) !important;
+            border-color: rgba(139, 33, 81, 0.6) !important;
+            box-shadow: 0 0 0 3px var(--sig-focus) !important;
+            outline: none;
+        }
+
+        .validation-error {
+            display: block;
+            margin-top: 0.45rem;
+            font-size: 0.75rem;
+            color: #f08fa3;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .alert-danger {
+            background: rgba(255, 100, 120, 0.08) !important;
+            border: 1px solid rgba(255, 100, 120, 0.2) !important;
+            border-radius: 1rem;
+            color: #f0a8bb !important;
+            padding: 1.1rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--sig-accent) 0%, var(--sig-accent-hover) 100%);
+            border: 0;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 0.95rem 1.5rem;
+            border-radius: 0.875rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 0.75rem;
+            box-shadow: 0 4px 15px rgba(139, 33, 81, 0.2);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 33, 81, 0.4);
+        }
+
+        .btn-login:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--sig-focus), 0 8px 25px rgba(139, 33, 81, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .divider-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2.25rem 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .divider-text {
+            font-size: 0.75rem;
+            color: var(--sig-text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .credentials-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.1rem;
+        }
+
+        .credential-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(139, 33, 81, 0.1);
+            border-radius: 1rem;
+            padding: 1.4rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .credential-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(139, 33, 81, 0.08), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+
+        .credential-card:hover {
+            border-color: rgba(139, 33, 81, 0.25);
+            background: linear-gradient(135deg, rgba(139, 33, 81, 0.06), rgba(255, 255, 255, 0.015));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .credential-card:hover::before {
+            opacity: 1;
+        }
+
+        .credential-role {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f5f7fa;
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            letter-spacing: 0.2px;
+        }
+
+        .credential-email {
+            font-size: 0.75rem;
+            color: var(--sig-text-secondary);
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+            font-family: ui-monospace, "SF Mono", "Monaco", "Cascadia Code", monospace;
+            font-weight: 500;
+        }
+
+        .credential-password {
+            font-size: 0.75rem;
+            color: var(--sig-text-secondary);
+            font-family: ui-monospace, "SF Mono", "Monaco", "Cascadia Code", monospace;
+            letter-spacing: 2.2px;
+            font-weight: 500;
+        }
+
+        .security-note {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--sig-text-secondary);
+            margin-top: 1.75rem;
+            padding-top: 1.1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .security-note i {
+            color: #7dd452;
+            font-size: 0.8rem;
+        }
+
+        @@media (max-width: 640px) {
+            main {
+                padding: 1rem;
+            }
+
+            .login-container {
+                width: 100%;
+            }
+
+            .login-card {
+                border-radius: 1.25rem;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            }
+
+            .card-header-section {
+                padding: 1.75rem 1.75rem 1.25rem;
+            }
+
+            .form-section {
+                padding: 1.75rem;
+            }
+
+            .system-icon {
+                width: 3.5rem;
+                height: 3.5rem;
+                font-size: 1.5rem;
+            }
+
+            .header-title {
+                font-size: 1.75rem;
+            }
+
+            .credentials-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .header-section {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header-section {
+            animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-group {
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="login-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <div class="header-badge">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Entorno Seguro
+                </div>
+                <h1 class="header-title">SIGERI</h1>
+                <p class="header-subtitle">Sistema de Gestión de Riesgos e Infraestructura</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="login-card">
+                <!-- Card Header -->
+                <div class="card-header-section">
+                    <div class="system-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h2 class="system-title">Autenticación Institucional</h2>
+                    <p class="system-desc">Acceso seguro a administración y analítica de riesgos</p>
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <!-- Validation Errors -->
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert-danger">
+                            @Html.ValidationSummary(excludePropertyErrors: true, message: "Credenciales inválidas. Intenta de nuevo:")
+                        </div>
+                    }
+
+                    <!-- Login Form -->
+                    <form asp-action="Login" asp-controller="Account" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Email Field -->
+                        <div class="form-group">
+                            <label asp-for="Correo" class="form-label">
+                                <i class="fa-solid fa-envelope"></i> Correo Electrónico
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-envelope input-icon"></i>
+                                <input asp-for="Correo" type="email" class="form-control" placeholder="usuario@sigeri.local" autocomplete="username" required />
+                            </div>
+                            <span asp-validation-for="Correo" class="validation-error"></span>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fa-solid fa-key"></i> Contraseña
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-key input-icon"></i>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="••••••••••" autocomplete="current-password" required />
+                            </div>
+                            <span asp-validation-for="Password" class="validation-error"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group">
+                            <button type="submit" class="btn-login">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i> Ingresar al Sistema
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider-box">
+                        <div class="divider-line"></div>
+                        <span class="divider-text">Credenciales de desarrollo</span>
+                        <div class="divider-line"></div>
+                    </div>
+
+                    <!-- Credentials Grid -->
+                    <div class="credentials-grid">
+                        <div class="credential-card">
+                            <div class="credential-role">
+                                <i class="fa-solid fa-shield-halved"></i> Administrador
+                            </div>
+                            <div class="credential-email">Usuario administrador configurado</div>
+                            <div class="credential-password">Definido por entorno (appsettings/variables de entorno)</div>
+                        </div>
+
+                        <div class="credential-card">
+                            <div class="credential-role">
+                                <i class="fa-solid fa-chart-line"></i> Analista de Riesgos
+                            </div>
+                            <div class="credential-email">Usuario analista configurado</div>
+                            <div class="credential-password">Definido por entorno (appsettings/variables de entorno)</div>
+                        </div>
+                    </div>
+
+                    <!-- Security Note -->
+                    <div class="security-note">
+                        <i class="fa-solid fa-circle-check"></i> Conexión validada mediante cookies y control de roles
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1N7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

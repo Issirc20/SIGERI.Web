@@ -1,0 +1,277 @@
+@model SIGERI.Web.ViewModels.Analytics.AnalyticsViewModel
+@{
+    ViewData["Title"] = "Dashboard de Riesgos";
+
+    var kpis = new[]
+    {
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Activos Totales", Value = Model.TotalAssets.ToString("N0"), Icon = "server", Variant = "primary", Trend = "Inventariados" },
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Riesgos Críticos", Value = Model.CriticalRisks.ToString("N0"), Icon = "zap", Variant = "danger", Trend = "Acción requerida" },
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Tratamientos Activos", Value = Model.ActiveTreatments.ToString("N0"), Icon = "shield-alert", Variant = "warning", Trend = "En mitigación" },
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Madurez NIST", Value = $"{Model.MaturityPercent}%", Icon = "star", Variant = "success", Trend = "Meta: 100%" },
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Exposición Total (ALE)", Value = $"S/ {Model.AleExpuesto:N0}", Icon = "activity", Variant = "danger", Trend = "Riesgo económico" },
+        new SIGERI.Web.ViewModels.Analytics.KpiCardViewModel { Title = "Evaluaciones Realizadas", Value = Model.OpenEvaluations.ToString("N0"), Icon = "clipboard-list", Variant = "info", Trend = "En el período" }
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+}
+
+<div class="dashboard-shell">
+    <!-- Header Area -->
+    <header class="dashboard-header-container">
+        <div class="dashboard-title-area">
+            <h1>Centro de Control de Riesgos</h1>
+            <p>Monitoreo ejecutivo en tiempo real de seguridad, madurez y cumplimiento industrial</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge" style="background: rgba(79, 70, 229, 0.1); color: var(--color-primary); border: 1px solid rgba(79, 70, 229, 0.2); padding: 8px 12px; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Metodología MAGERIT v3
+            </span>
+        </div>
+    </header>
+
+    <!-- KPI Section: 12-Column Responsive Grid -->
+    <section class="dashboard-grid" aria-label="Indicadores Clave de Riesgo">
+        @foreach (var kpi in kpis)
+        {
+            <div class="span-2">
+                @await Html.PartialAsync("_KpiCard", kpi)
+            </div>
+        }
+    </section>
+
+    <!-- Charts Row 1: Risk Matrix and Risk Distribution -->
+    <section class="dashboard-grid">
+        <!-- 5x5 Interactive Risk Matrix -->
+        <div class="span-6 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="grid-3x3" class="color-critical"></i> Matriz de Riesgos (5x5)
+            </div>
+            <div class="dashboard-card-subtitle">Clasificación de escenarios por probabilidad e impacto económico</div>
+            
+            <div class="risk-matrix-container">
+                <div class="risk-matrix-grid">
+                    @for (int prob = 5; prob >= 1; prob--)
+                    {
+                        <div class="matrix-label-y">P-@prob</div>
+                        @for (int imp = 1; imp <= 5; imp++)
+                        {
+                            var X = imp;
+                            var Y = prob;
+                            var cellCount = Model.HeatPoints.Count(p => p.Impact == X && p.Probability == Y);
+                            var score = X * Y;
+                            
+                            var (severity, severityLabel) = score switch
+                            {
+                                >= 20 => ("critical", "Crítico"),
+                                >= 12 => ("high", "Alto"),
+                                >= 5 => ("medium", "Medio"),
+                                _ => ("low", "Bajo")
+                            };
+                            
+                            <div class="matrix-cell matrix-cell--@severity @(cellCount == 0 ? "matrix-cell--empty" : "")" 
+                                 data-impact="@X" data-probability="@Y" data-severity="@severityLabel" data-count="@cellCount">
+                                <span class="matrix-cell-count">@(cellCount > 0 ? cellCount.ToString() : "0")</span>
+                                <div class="matrix-cell-tooltip">
+                                    <strong>@severityLabel (Score: @score)</strong><br/>
+                                    Probabilidad: @Y | Impacto: @X<br/>
+                                    Escenarios: @cellCount
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div></div>
+                    <div class="matrix-label-x">I-1</div>
+                    <div class="matrix-label-x">I-2</div>
+                    <div class="matrix-label-x">I-3</div>
+                    <div class="matrix-label-x">I-4</div>
+                    <div class="matrix-label-x">I-5</div>
+                </div>
+                
+                <div class="risk-matrix-legend">
+                    <div class="legend-item"><div class="legend-dot legend-dot--critical"></div> Crítico (20-25)</div>
+                    <div class="legend-item"><div class="legend-dot legend-dot--high"></div> Alto (12-16)</div>
+                    <div class="legend-item"><div class="legend-dot legend-dot--medium"></div> Medio (5-10)</div>
+                    <div class="legend-item"><div class="legend-dot legend-dot--low"></div> Bajo (1-4)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Distribution -->
+        <div class="span-6 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="bar-chart-3" class="color-high"></i> Distribución de Riesgos
+            </div>
+            <div class="dashboard-card-subtitle">Conteo de amenazas detectadas según su severidad</div>
+            <div style="position: relative; flex-grow: 1; min-height: 250px;">
+                <canvas id="chartDistribution"></canvas>
+            </div>
+            <script type="application/json" id="chartDistribution-data">
+                {
+                    "labels": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LevelLabels)),
+                    "values": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LevelValues))
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- Charts Row 2: Trend and Asset Categories -->
+    <section class="dashboard-grid">
+        <!-- Risk Trend -->
+        <div class="span-7 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="trending-up" style="color: var(--color-primary);"></i> Histórico de Inversión y Mitigación
+            </div>
+            <div class="dashboard-card-subtitle">Evolución temporal del presupuesto ejecutado en planes de tratamiento</div>
+            <div style="position: relative; flex-grow: 1; min-height: 250px;">
+                <canvas id="chartTrend"></canvas>
+            </div>
+            <script type="application/json" id="chartTrend-data">
+                {
+                    "labels": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)),
+                    "values": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrendValues))
+                }
+            </script>
+        </div>
+
+        <!-- Asset Categories -->
+        <div class="span-5 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="pie-chart" style="color: var(--color-info);"></i> Inventario por Categoría
+            </div>
+            <div class="dashboard-card-subtitle">Distribución porcentual de activos en la organización</div>
+            <div style="position: relative; flex-grow: 1; min-height: 250px;">
+                <canvas id="chartCategories"></canvas>
+            </div>
+            <script type="application/json" id="chartCategories-data">
+                {
+                    "labels": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryLabels)),
+                    "values": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryValues))
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- Charts Row 3: NIST, ISO, Treatments -->
+    <section class="dashboard-grid">
+        <!-- NIST CSF Progress -->
+        <div class="span-4 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="shield-check" style="color: var(--color-primary);"></i> Madurez NIST CSF 2.0
+            </div>
+            <div class="dashboard-card-subtitle">Cumplimiento por funciones y dominios del estándar</div>
+            <div style="position: relative; flex-grow: 1; min-height: 220px;">
+                <canvas id="chartNistRadar"></canvas>
+            </div>
+            <script type="application/json" id="chartNistRadar-data">
+                {
+                    "labels": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RadarLabels)),
+                    "values": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RadarValues))
+                }
+            </script>
+        </div>
+
+        <!-- ISO 27001 Compliance -->
+        <div class="span-4 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="award" style="color: var(--color-success);"></i> Cumplimiento ISO 27001
+            </div>
+            <div class="dashboard-card-subtitle">Grado de madurez estimado frente al Anexo A</div>
+            <div style="position: relative; flex-grow: 1; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="width: 100%; height: 180px; position: relative;">
+                    <canvas id="chartIsoCompliance"></canvas>
+                    <div style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <span style="font-size: 1.75rem; font-weight: 800; color: var(--color-text-main);">@Model.ComplianceIso%</span>
+                        <br/>
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">ISO Score</span>
+                    </div>
+                </div>
+            </div>
+            <script type="application/json" id="chartIsoCompliance-data">
+                {
+                    "value": @Model.ComplianceIso
+                }
+            </script>
+        </div>
+
+        <!-- Treatment Status -->
+        <div class="span-4 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="check-circle" style="color: var(--color-success);"></i> Estado del Plan de Mitigación
+            </div>
+            <div class="dashboard-card-subtitle">Relación entre tratamientos completados y pendientes</div>
+            <div style="position: relative; flex-grow: 1; min-height: 220px;">
+                <canvas id="chartTreatmentStatus"></canvas>
+            </div>
+            <script type="application/json" id="chartTreatmentStatus-data">
+                {
+                    "labels": ["Mitigado (Completado)", "Pendiente"],
+                    "values": [@Model.TreatmentsImplemented, @Model.PendingRisks]
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- Tables Row: Recent Risks and Recent Activity -->
+    <section class="dashboard-grid">
+        <!-- Recent Risks Table -->
+        <div class="span-8 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="alert-triangle" class="color-critical"></i> Riesgos Identificados Recientemente
+            </div>
+            <div class="dashboard-card-subtitle">Últimos incidentes y vulnerabilidades catalogadas en el sistema</div>
+            <div style="flex-grow: 1; margin-top: 8px;">
+                @await Html.PartialAsync("_RecentRisks", Model.RecentRisks)
+            </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="span-4 dashboard-card">
+            <div class="dashboard-card-title">
+                <i data-lucide="activity" style="color: var(--color-primary);"></i> Bitácora de Actividad Reciente
+            </div>
+            <div class="dashboard-card-subtitle">Historial cronológico de acciones y auditorías</div>
+            <div style="flex-grow: 1; margin-top: 8px;">
+                @await Html.PartialAsync("_RecentActivity", Model.RecentActivities)
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Catalogs & Navigation -->
+    <section class="mb-4">
+        <div class="dashboard-card-title mb-3" style="font-size: 1.1rem;">
+            <i data-lucide="sliders" style="color: var(--color-primary);"></i> Módulos de Administración
+        </div>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a asp-controller="Activos" asp-action="Index" class="quick-action-button">
+                    <div class="quick-action-icon-wrapper"><i data-lucide="server"></i></div>
+                    Inventario Activos
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Dependencias" asp-action="Index" class="quick-action-button">
+                    <div class="quick-action-icon-wrapper" style="background: var(--color-info-light); color: var(--color-info);"><i data-lucide="share-2"></i></div>
+                    Dependencias Activos
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="PerfilesCriticos" asp-action="Index" class="quick-action-button">
+                    <div class="quick-action-icon-wrapper" style="background: var(--color-danger-light); color: var(--color-danger);"><i data-lucide="layers"></i></div>
+                    Perfiles Críticos
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="ControlesMadurez" asp-action="Index" class="quick-action-button">
+                    <div class="quick-action-icon-wrapper" style="background: var(--color-success-light); color: var(--color-success);"><i data-lucide="signal"></i></div>
+                    Madurez Controles
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/dashboard.js"></script>
+}

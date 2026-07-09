@@ -1,0 +1,64 @@
+@model SIGERI.Application.DTOs.PlanTratamientoDto
+@{
+    ViewData["Title"] = "Detalle — Plan de Tratamiento";
+    var aleResidual = Model.AleResidual;
+    var ahorro      = Model.AleBase - aleResidual;
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <div class="sig-page-subtitle"><i class="fa-solid fa-shield-halved"></i> Plan de Tratamiento</div>
+        <p class="sig-page-desc">Riesgo: <strong>@Model.RiesgoNombre</strong> — Estrategia: <strong>@Model.Estrategia</strong></p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sig"><i class="fa-solid fa-pen me-1"></i>Editar</a>
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="sig-card p-3">
+            <h6 class="fw-bold mb-3" style="color:var(--sig-accent-2);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em">
+                <i class="fa-solid fa-info-circle me-2"></i>Datos Generales
+            </h6>
+            <dl class="row mb-0">
+                <dt class="col-sm-5 text-muted small">Estrategia</dt>
+                <dd class="col-sm-7 fw-semibold">@Model.Estrategia</dd>
+                <dt class="col-sm-5 text-muted small">Estado</dt>
+                <dd class="col-sm-7"><span class="badge bg-secondary">@Model.Estado</span></dd>
+                <dt class="col-sm-5 text-muted small">Vigencia</dt>
+                <dd class="col-sm-7">@Model.FechaInicio.ToString("dd/MM/yyyy") — @Model.FechaTermino.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-5 text-muted small">Controles</dt>
+                <dd class="col-sm-7">@Model.TotalControles</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="sig-card p-3" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25)">
+            <h6 class="fw-bold mb-3" style="color:#10b981;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em">
+                <i class="fa-solid fa-chart-line me-2"></i>Análisis Financiero (ROSI)
+            </h6>
+            <dl class="row mb-0">
+                <dt class="col-sm-7 text-muted small">ALE Base</dt>
+                <dd class="col-sm-5 fw-bold" style="color:#ef4444">S/ @Model.AleBase.ToString("N0")</dd>
+                <dt class="col-sm-7 text-muted small">Costo Salvaguarda</dt>
+                <dd class="col-sm-5 fw-bold" style="color:#f59e0b">S/ @Model.CostoSalvaguarda.ToString("N0")</dd>
+                <dt class="col-sm-7 text-muted small">% Mitigación</dt>
+                <dd class="col-sm-5 fw-bold">@Model.PorcentajeMitigacion.ToString("N0")%</dd>
+                <dt class="col-sm-7 text-muted small">ALE Residual</dt>
+                <dd class="col-sm-5 fw-bold" style="color:#f59e0b">S/ @aleResidual.ToString("N0")</dd>
+                <dt class="col-sm-7 text-muted small">Ahorro Neto</dt>
+                <dd class="col-sm-5 fw-bold" style="color:#3b82f6">S/ @ahorro.ToString("N0")</dd>
+                <dt class="col-sm-7 text-muted small fw-bold">ROSI</dt>
+                <dd class="col-sm-5 fw-bold fs-5" style="color:@(Model.Rosi >= 0 ? "#10b981":"#ef4444")">@Model.Rosi.ToString("N1")%</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="sig-card p-3">
+            <h6 class="fw-bold mb-2" style="color:var(--sig-accent-2);font-size:.75rem;text-transform:uppercase">Descripción</h6>
+            <p style="white-space:pre-wrap">@Model.Descripcion</p>
+        </div>
+    </div>
+</div>

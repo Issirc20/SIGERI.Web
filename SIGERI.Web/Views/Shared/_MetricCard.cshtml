@@ -1,0 +1,12 @@
+@* Componente reutilizable para tarjetas de métrica/KPI *@
+@model (string Label, string Value, string Icon, string AccentColor)
+
+<div class="sig-card sig-kpi-card">
+    <div>
+        <div class="sig-kpi-label">@Model.Label</div>
+        <div class="sig-kpi-value">@Model.Value</div>
+    </div>
+    <div class="sig-kpi-icon" style="background: rgba(@Model.AccentColor, 0.2); color: @Model.AccentColor;">
+        <i class="fa-solid @Model.Icon"></i>
+    </div>
+</div>

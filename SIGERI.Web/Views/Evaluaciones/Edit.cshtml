@@ -1,0 +1,68 @@
+@model SIGERI.Application.DTOs.EvaluacionDto
+@{
+    ViewData["Title"] = "Editar Evaluación";
+    var activos  = ViewBag.Activos  as IReadOnlyCollection<SIGERI.Application.DTOs.ActivoDto>  ?? [];
+    var usuarios = ViewBag.Usuarios as IReadOnlyCollection<SIGERI.Application.DTOs.UsuarioDto> ?? [];
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <div class="sig-page-subtitle"><i class="fa-solid fa-pen"></i> Editar Evaluación</div>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
+</div>
+
+<div class="sig-card p-4">
+    <form asp-action="Edit" asp-route-id="@Model?.Id" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model?.Id" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Fecha de Evaluación <span class="text-danger">*</span></label>
+                <input type="datetime-local" name="fecha" class="form-control sig-input"
+                       value="@Model?.Fecha.ToString("yyyy-MM-ddTHH:mm")" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Activo Evaluado <span class="text-danger">*</span></label>
+                <select name="activoId" class="form-select sig-input" required>
+                    @foreach (var a in activos)
+                    {
+                        <option value="@a.Id" selected="@(a.Id == Model?.ActivoId)">[@a.Codigo] @a.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Responsable <span class="text-danger">*</span></label>
+                <select name="usuarioId" class="form-select sig-input" required>
+                    @foreach (var u in usuarios)
+                    {
+                        <option value="@u.Id" selected="@(u.Id == Model?.UsuarioId)">@u.Nombre @u.Apellido (@u.Rol)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Observaciones <span class="text-danger">*</span></label>
+                <textarea name="observaciones" class="form-control sig-input" rows="4" required>@Model?.Observaciones</textarea>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <div>@error.ErrorMessage</div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="col-12 d-flex gap-2 justify-content-end">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-sig"><i class="fa-solid fa-save me-2"></i>Actualizar</button>
+            </div>
+        </div>
+    </form>
+</div>

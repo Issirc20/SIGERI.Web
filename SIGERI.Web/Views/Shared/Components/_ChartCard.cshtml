@@ -1,0 +1,25 @@
+@model dynamic
+@{
+    string? title = null;
+    string? subtitle = null;
+    string? canvasId = null;
+    string? jsonData = null;
+
+    if (Model != null)
+    {
+        var t = Model.GetType();
+        var pTitle = t.GetProperty("Title"); if (pTitle != null) title = pTitle.GetValue(Model)?.ToString();
+        var pSubtitle = t.GetProperty("Subtitle"); if (pSubtitle != null) subtitle = pSubtitle.GetValue(Model)?.ToString();
+        var pCanvas = t.GetProperty("CanvasId"); if (pCanvas != null) canvasId = pCanvas.GetValue(Model)?.ToString();
+        var pJson = t.GetProperty("JsonData"); if (pJson != null) jsonData = pJson.GetValue(Model)?.ToString();
+    }
+}
+
+<div class="chart-card sig-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="card-title">@(title ?? "")</div>
+        @if(!string.IsNullOrEmpty(subtitle)){ <div class="card-sub">@subtitle</div> }
+    </div>
+    <canvas class="chart-canvas" id="@(canvasId ?? "")" aria-label="@(title ?? "")" role="img"></canvas>
+    @if(!string.IsNullOrEmpty(jsonData)){ <script type="application/json" class="chart-data" data-target="#@(canvasId ?? "")">@Html.Raw(jsonData)</script> }
+</div>

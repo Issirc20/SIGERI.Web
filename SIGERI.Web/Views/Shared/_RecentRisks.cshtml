@@ -1,0 +1,80 @@
+@model IEnumerable<SIGERI.Web.ViewModels.Analytics.RecentRiskDto>
+
+<div class="table-responsive">
+    <table class="enterprise-table" aria-label="Riesgos Recientes">
+        <thead>
+            <tr>
+                <th scope="col">Escenario de Riesgo</th>
+                <th scope="col">Activo Afectado</th>
+                <th scope="col">Severidad</th>
+                <th scope="col" class="text-end">Puntaje</th>
+                <th scope="col" class="text-end">Fecha de Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var risk in Model)
+                {
+                    var badgeClass = risk.Level switch
+                    {
+                        "Crítico" => "badge-severity--critical",
+                        "Alto" => "badge-severity--high",
+                        "Medio" => "badge-severity--medium",
+                        "Bajo" => "badge-severity--low",
+                        _ => "badge-severity--neutral"
+                    };
+
+                    var scoreColor = risk.Score switch
+                    {
+                        >= 20 => "color-critical fw-bold",
+                        >= 12 => "color-high fw-bold",
+                        >= 5 => "color-medium",
+                        _ => "color-low"
+                    };
+
+                    var levelLower = string.IsNullOrEmpty(risk.Level) ? "neutral" : risk.Level.ToLower() switch 
+                    {
+                        "crítico" => "critical",
+                        "alto" => "high",
+                        "medio" => "medium",
+                        "bajo" => "low",
+                        _ => "neutral"
+                    };
+
+                    <tr>
+                        <td>
+                            <div class="risk-name-cell">
+                                <i data-lucide="shield-alert" class="risk-icon risk-icon--@levelLower"></i>
+                                <span class="risk-title" title="@risk.RiskName">@risk.RiskName</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="asset-tag">
+                                <i data-lucide="server" class="tag-icon"></i> @risk.AssetName
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge-severity @badgeClass">@risk.Level</span>
+                        </td>
+                        <td class="text-end font-monospace @scoreColor">
+                            @risk.Score/25
+                        </td>
+                        <td class="text-end text-muted font-monospace text-nowrap">
+                            @risk.Date.ToString("yyyy-MM-dd HH:mm")
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i data-lucide="inbox" class="empty-icon mb-2"></i>
+                        <div>No se encontraron riesgos recientes</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

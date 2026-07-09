@@ -1,0 +1,10 @@
+@model dynamic
+<div class="sig-card progress-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="card-title">@Model.Title</div>
+        <div class="small text-muted">@Model.Percent% completa</div>
+    </div>
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" style="width:@Model.Percent% ; background: linear-gradient(90deg,var(--primary),var(--primary-2));" aria-valuenow="@Model.Percent" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+</div>

@@ -1,0 +1,378 @@
+@model SIGERI.Web.ViewModels.Activos.ActivosIndexViewModel
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Inventario de Activos";
+}
+
+<style>
+    /* PAGE-SPECIFIC STYLES */
+    .sig-asset-type {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .sig-criticality-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .sig-criticality-critical {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b7a;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .sig-criticality-high {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .sig-criticality-media {
+        background: rgba(255, 159, 64, 0.2);
+        color: #ff9f40;
+        border: 1px solid rgba(255, 159, 64, 0.3);
+    }
+
+    .sig-criticality-baja {
+        background: rgba(76, 175, 80, 0.2);
+        color: #66bb6a;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .sig-org-tag {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        background: rgba(139, 92, 246, 0.15);
+        color: var(--sig-accent-2);
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .sig-code {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--sig-accent-2);
+    }
+
+    .sig-asset-name {
+        font-weight: 600;
+        color: var(--sig-dark-text);
+    }
+
+    /* PAGINATION */
+    .sig-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .sig-page-header {
+            gap: 1rem;
+        }
+
+        .sig-controls-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .sig-filters {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .sig-table th,
+        .sig-table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .sig-filters {
+            flex-wrap: wrap;
+        }
+    }
+
+    .sig-table tbody tr {
+        border-top: 1px solid var(--sig-dark-border);
+    }
+
+    .sig-pagination a,
+    .sig-pagination button {
+        padding: 0.5rem 0.75rem;
+        background: var(--sig-dark-surface-2);
+        border: 1px solid var(--sig-dark-border);
+        border-radius: 0.5rem;
+        color: var(--sig-dark-text);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .sig-pagination a:hover,
+    .sig-pagination button:hover {
+        background: rgba(93, 63, 160, 0.15);
+        border-color: var(--sig-accent);
+        color: var(--sig-accent-2);
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .sig-page-header {
+            gap: 1rem;
+        }
+
+        .sig-controls-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .sig-search-box {
+            width: 100%;
+        }
+
+        .sig-filters {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .sig-table th,
+        .sig-table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .sig-table {
+            font-size: 0.85rem;
+        }
+
+        .sig-stats-row {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .sig-page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .sig-controls-bar {
+            padding: 0.75rem;
+        }
+
+        .sig-search-box input {
+            padding: 0.5rem 0.75rem 0.5rem 2rem;
+            font-size: 0.85rem;
+        }
+
+        .sig-table th,
+        .sig-table td {
+            padding: 0.6rem 0.4rem;
+            font-size: 0.75rem;
+        }
+
+        .sig-code {
+            font-size: 0.75rem;
+        }
+
+        .sig-asset-type,
+        .sig-criticality-badge,
+        .sig-org-tag {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+        }
+
+        .sig-stats-row {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .sig-stat-card {
+            padding: 0.75rem;
+        }
+
+        .sig-stat-value {
+            font-size: 1.3rem;
+        }
+    }
+
+    /* ANIMATIONS */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .sig-table tbody tr {
+        animation: fadeIn 0.4s ease;
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <span class="badge" style="width: fit-content; background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); padding: 0.5rem 1rem; border-radius: 999px;">
+            MAGERIT v3
+        </span>
+        <div class="sig-page-subtitle">
+            <i class="fa-solid fa-server"></i>
+            Inventario Avanzado de Activos
+        </div>
+        <p class="sig-page-desc">
+            Catálogo de activos tecnológicos, organizacionales y operativos con clasificación MAGERIT v3.
+        </p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Create" class="btn btn-sig">
+            <i class="fa-solid fa-plus me-2"></i>Nuevo Activo
+        </a>
+    </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="sig-stats-row">
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Total Activos</div>
+        <div class="sig-stat-value">@Model.Activos.Count</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Críticas</div>
+        <div class="sig-stat-value" style="color: #ff6b7a;">@Model.CriticosCount</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Altas</div>
+        <div class="sig-stat-value" style="color: #ffc107;">@Model.AltosCount</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Medias</div>
+        <div class="sig-stat-value" style="color: #ff9f40;">@Model.MediosCount</div>
+    </div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div class="sig-controls-bar">
+    <div class="sig-search-box">
+        <i class="fa-solid fa-search sig-search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre, código o tipo...">
+    </div>
+    <div class="sig-filters">
+        <button class="sig-filter-btn active" onclick="filterAssets('all', this)">
+            <i class="fa-solid fa-layer-group me-1"></i>Todos
+        </button>
+        <button class="sig-filter-btn" onclick="filterAssets('critical', this)">
+            <i class="fa-solid fa-exclamation-triangle me-1"></i>Críticos
+        </button>
+    </div>
+</div>
+
+<!-- TABLE -->
+@if (Model.Activos.Any())
+{
+    <div class="sig-table-wrapper">
+        <table class="sig-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Criticidad</th>
+                    <th>Organización</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var activo in Model.Activos)
+                {
+                    var criticalityClass = activo.Criticidad == Criticidad.Critica ? "sig-criticality-critical"
+                        : activo.Criticidad == Criticidad.Alta ? "sig-criticality-high"
+                        : activo.Criticidad == Criticidad.Media ? "sig-criticality-media"
+                        : "sig-criticality-baja";
+
+                    <tr>
+                        <td>
+                            <span class="sig-code">@activo.Codigo</span>
+                        </td>
+                        <td>
+                            <span class="sig-asset-name">@activo.Nombre</span>
+                        </td>
+                        <td>
+                            <span class="sig-asset-type">@activo.Tipo</span>
+                        </td>
+                        <td>
+                            <span class="sig-criticality-badge @criticalityClass">
+                                @activo.Criticidad
+                            </span>
+                        </td>
+                        <td>
+                            <span class="sig-org-tag">@activo.NombreOrganizacion</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="sig-card sig-empty-state">
+        <div class="sig-empty-icon">
+            <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div class="sig-empty-title">No hay activos registrados</div>
+        <p>Comienza creando tu primer activo con la información de clasificación MAGERIT v3.</p>
+        <a asp-action="Create" class="btn btn-sig mt-3">
+            <i class="fa-solid fa-plus me-2"></i>Crear Primer Activo
+        </a>
+    </div>
+}
+
+<script>
+    // SEARCH FUNCTIONALITY
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('.sig-table tbody tr');
+
+    searchInput?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // FILTER FUNCTIONALITY
+    function filterAssets(type, triggerButton) {
+        const buttons = document.querySelectorAll('.sig-filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        triggerButton?.classList.add('active');
+
+        tableRows.forEach(row => {
+            if (type === 'all') {
+                row.style.display = '';
+            } else if (type === 'critical') {
+                const criticalityCell = row.cells[3];
+                const isCritical = criticalityCell.textContent.includes('Critica');
+                row.style.display = isCritical ? '' : 'none';
+            }
+        });
+    }
+</script>

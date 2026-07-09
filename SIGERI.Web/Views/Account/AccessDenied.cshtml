@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Acceso denegado";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-12 col-lg-8 col-xl-6">
+        <div class="sig-panel text-white border border-secondary">
+            <div class="p-4 p-lg-5 text-center">
+                <div class="mx-auto rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width:72px;height:72px;background:rgba(255,143,143,.12);border:1px solid rgba(255,143,143,.22);">
+                    <i class="fa-solid fa-lock fa-xl text-danger"></i>
+                </div>
+
+                <h1 class="h3 fw-bold mb-3">Acceso denegado</h1>
+                <p class="text-white-50 mb-4">
+                    Tu sesión no tiene permisos suficientes para acceder a este recurso.
+                    Inicia sesión con una cuenta autorizada o contacta al administrador del sistema.
+                </p>
+
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a class="btn btn-info text-dark fw-semibold" href="/Account/Login">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Ir al login
+                    </a>
+                    <a class="btn btn-outline-light" href="/Home/Index">
+                        <i class="fa-solid fa-gauge-high me-1"></i> Volver al dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

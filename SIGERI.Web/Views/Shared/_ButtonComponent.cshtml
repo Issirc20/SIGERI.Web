@@ -1,0 +1,10 @@
+@* Componente reutilizable para botones modernos *@
+@model (string Text, string Icon, string Url, string Class)
+
+<a href="@Model.Url" class="btn btn-sig @Model.Class">
+    @if (!string.IsNullOrEmpty(Model.Icon))
+    {
+        <i class="fa-solid @Model.Icon me-2"></i>
+    }
+    @Model.Text
+</a>

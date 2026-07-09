@@ -1,0 +1,126 @@
+@model IReadOnlyCollection<SIGERI.Application.DTOs.PlanTratamientoDto>
+@using SIGERI.Domain.Enums
+@{
+    ViewData["Title"] = "Planes de Tratamiento";
+    var totalAleBase    = Model.Any() ? Model.Sum(x => x.AleBase)    : 0m;
+    var totalAleResid   = Model.Any() ? Model.Sum(x => x.AleResidual): 0m;
+    var avgRosi         = Model.Any(x => x.CostoSalvaguarda > 0) ? Model.Where(x => x.CostoSalvaguarda > 0).Average(x => x.Rosi) : 0m;
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="fa-solid fa-circle-check me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="sig-page-header">
+    <div class="sig-page-title-section">
+        <span class="badge" style="width:fit-content;background:rgba(245,158,11,.2);color:#f59e0b;border:1px solid rgba(245,158,11,.4);padding:.5rem 1rem;border-radius:999px;">
+            ROSI · ALE · SLE
+        </span>
+        <div class="sig-page-subtitle"><i class="fa-solid fa-shield-halved"></i> Planes de Tratamiento</div>
+        <p class="sig-page-desc">Gestión financiera del riesgo: ROSI, ALE base, ALE residual y estrategias de mitigación.</p>
+    </div>
+    <div class="sig-page-actions">
+        <a asp-action="Create" class="btn btn-sig"><i class="fa-solid fa-plus me-2"></i>Nuevo Plan</a>
+    </div>
+</div>
+
+<div class="sig-stats-row">
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">Total Planes</div>
+        <div class="sig-stat-value">@Model.Count</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">ALE Base Total</div>
+        <div class="sig-stat-value" style="color:#ef4444">S/ @totalAleBase.ToString("N0")</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">ALE Residual</div>
+        <div class="sig-stat-value" style="color:#f59e0b">S/ @totalAleResid.ToString("N0")</div>
+    </div>
+    <div class="sig-stat-card">
+        <div class="sig-stat-label">ROSI Promedio</div>
+        <div class="sig-stat-value" style="color:#10b981">@avgRosi.ToString("N1")%</div>
+    </div>
+</div>
+
+<div class="sig-controls-bar">
+    <div class="sig-search-box">
+        <i class="fa-solid fa-search sig-search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por riesgo, estrategia...">
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="sig-table-wrapper">
+        <table class="sig-table" id="tblTrat">
+            <thead>
+                <tr>
+                    <th>Riesgo</th>
+                    <th>Estrategia</th>
+                    <th>Estado</th>
+                    <th>ALE Base</th>
+                    <th>ALE Residual</th>
+                    <th>ROSI</th>
+                    <th>Vigencia</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    var estadoColor = p.Estado == EstadoPlan.EnProgreso ? "#10b981"
+                        : p.Estado == EstadoPlan.Completado ? "#3b82f6"
+                        : p.Estado == EstadoPlan.Vencido ? "#ef4444"
+                        : "#9ca3af";
+                    <tr>
+                        <td><strong>@p.RiesgoNombre</strong></td>
+                        <td>@p.Estrategia</td>
+                        <td>
+                            <span class="badge" style="background:rgba(0,0,0,.2);color:@estadoColor;border:1px solid @estadoColor">
+                                @p.Estado
+                            </span>
+                        </td>
+                        <td>S/ @p.AleBase.ToString("N0")</td>
+                        <td>S/ @p.AleResidual.ToString("N0")</td>
+                        <td>
+                            <span class="fw-bold" style="color:@(p.Rosi >= 0 ? "#10b981":"#ef4444")">
+                                @p.Rosi.ToString("N1")%
+                            </span>
+                        </td>
+                        <td>@p.FechaInicio.ToString("MM/yyyy") — @p.FechaTermino.ToString("MM/yyyy")</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye"></i></a>
+                                <a asp-action="Edit"    asp-route-id="@p.Id" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></a>
+                                <form asp-action="Delete" asp-route-id="@p.Id" method="post" onsubmit="return confirm('¿Eliminar este plan?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="sig-card sig-empty-state">
+        <div class="sig-empty-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="sig-empty-title">No hay planes de tratamiento</div>
+        <a asp-action="Create" class="btn btn-sig mt-3"><i class="fa-solid fa-plus me-2"></i>Crear Primer Plan</a>
+    </div>
+}
+
+<script>
+    document.getElementById('searchInput')?.addEventListener('input', e => {
+        const t = e.target.value.toLowerCase();
+        document.querySelectorAll('#tblTrat tbody tr').forEach(r =>
+            r.style.display = r.textContent.toLowerCase().includes(t) ? '' : 'none');
+    });
+</script>

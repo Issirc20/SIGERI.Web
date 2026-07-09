@@ -1,0 +1,36 @@
+@model SIGERI.Web.ViewModels.Analytics.KpiCardViewModel
+
+<div class="kpi-card kpi-card--@Model.Variant" role="region" aria-label="@Model.Title">
+    <div class="kpi-card-header">
+        <span class="kpi-card-title">@Model.Title</span>
+        <div class="kpi-card-icon-wrapper">
+            <i data-lucide="@Model.Icon" class="kpi-card-icon"></i>
+        </div>
+    </div>
+    <div class="kpi-card-body">
+        <h3 class="kpi-card-value">@Model.Value</h3>
+        @if (!string.IsNullOrEmpty(Model.Trend))
+        {
+            <div class="kpi-card-trend">
+                @if (Model.Trend.StartsWith("+") || Model.Trend.Contains("óptimo") || Model.Trend.Contains("mejor") || Model.Trend.Contains("Completo") || Model.Trend.Contains("S/"))
+                {
+                    <span class="trend-indicator trend-indicator--up">
+                        <i data-lucide="trending-up" class="trend-icon"></i> @Model.Trend
+                    </span>
+                }
+                else if (Model.Trend.StartsWith("-") || Model.Trend.Contains("Críticos") || Model.Trend.Contains("alto") || Model.Trend.Contains("pendiente"))
+                {
+                    <span class="trend-indicator trend-indicator--down">
+                        <i data-lucide="trending-down" class="trend-icon"></i> @Model.Trend
+                    </span>
+                }
+                else
+                {
+                    <span class="trend-indicator trend-indicator--neutral">
+                        @Model.Trend
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

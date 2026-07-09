@@ -1,0 +1,12 @@
+@model dynamic
+<div class="notification-item d-flex gap-2 align-items-start p-2">
+    <i data-lucide="@Model.Icon" width="20" height="20"></i>
+    <div class="flex-grow-1">
+        <div class="small fw-bold">@Model.Title</div>
+        <div class="small text-muted">@Model.Message</div>
+        <div class="small text-muted mt-1">@Model.Time</div>
+    </div>
+    <div>
+        @if(Model?.Actions != null){ @Html.Raw(Model.Actions) }
+    </div>
+</div>

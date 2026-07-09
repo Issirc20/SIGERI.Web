@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="SIGERI.Application/SIGERI.Application.csproj" />
+  <Project Path="SIGERI.Domain/SIGERI.Domain.csproj" />
+  <Project Path="SIGERI.Infrastructure/SIGERI.Infrastructure.csproj" />
+  <Project Path="SIGERI.UnitTests/SIGERI.UnitTests.csproj" />
+  <Project Path="SIGERI.IntegrationTests/SIGERI.IntegrationTests.csproj" />
+  <Project Path="SIGERI.Web/SIGERI.Web.csproj" />
+</Solution>

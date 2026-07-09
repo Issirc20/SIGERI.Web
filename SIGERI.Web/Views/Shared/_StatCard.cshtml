@@ -1,0 +1,26 @@
+@model dynamic
+@{
+    string? label = null;
+    string? value = null;
+    string? icon = null;
+    string? bg = null;
+    string? color = null;
+    if (Model != null)
+    {
+        var t = Model.GetType();
+        var pLabel = t.GetProperty("Label"); if (pLabel != null) label = pLabel.GetValue(Model)?.ToString();
+        var pValue = t.GetProperty("Value"); if (pValue != null) value = pValue.GetValue(Model)?.ToString();
+        var pIcon = t.GetProperty("Icon"); if (pIcon != null) icon = pIcon.GetValue(Model)?.ToString();
+        var pBg = t.GetProperty("Bg"); if (pBg != null) bg = pBg.GetValue(Model)?.ToString();
+        var pColor = t.GetProperty("Color"); if (pColor != null) color = pColor.GetValue(Model)?.ToString();
+    }
+}
+<div class="sig-card sig-kpi-card" role="group" aria-label="@(label ?? "")">
+    <div>
+        <div class="sig-kpi-label">@(label ?? "")</div>
+        <div class="sig-kpi-value">@(value ?? "")</div>
+    </div>
+    <div class="sig-kpi-icon" style="background: @(bg ?? "transparent"); color: @(color ?? "var(--primary-2)");">
+        <i data-lucide="@(icon ?? "")" width="24" height="24"></i>
+    </div>
+</div>

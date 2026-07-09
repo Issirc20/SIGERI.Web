@@ -1,0 +1,40 @@
+@using System.Security.Claims
+@{
+    var isAuthenticated = User?.Identity?.IsAuthenticated == true;
+    var displayName = User?.Identity?.Name ?? "Usuario";
+    var roleName = User?.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+}
+
+@if (isAuthenticated)
+{
+    <div class="sig-user-menu">
+        <button class="sig-user-toggle" type="button" aria-expanded="false" aria-haspopup="true">
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="d-none d-lg-inline text-truncate">@displayName</span>
+        </button>
+        <ul class="sig-user-dropdown">
+            <li class="px-3 py-2">
+                <div class="fw-semibold sig-user-name text-truncate">@displayName</div>
+                @if (!string.IsNullOrWhiteSpace(roleName))
+                {
+                    <div class="small sig-user-role text-truncate">@roleName</div>
+                }
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="dropdown-item text-danger fw-semibold">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Salir
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-sm px-3 fw-semibold text-white">
+        <i class="fa-solid fa-right-to-bracket me-1"></i> Acceder
+    </a>
+}

@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+publish/
+TestResults/
+*.user
+*.suo
+
+# IDE
+.vs/
+.vscode/
+
+# Logs and generated validation artifacts
+*.log
+Build.log
+Test.log
+Server.log
+Home.html
+Index.html
+ValidationReport/*.html
+ValidationReport/*.txt
+ValidationReport/*Report.md
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Secrets
+secrets.json
+appsettings.Local.json
