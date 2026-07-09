@@ -71,5 +71,6 @@ dotnet test
 ---
 
 ## 📝 Documentación del Proyecto
-Para detalles específicos sobre el cumplimiento del ciclo de vida de desarrollo de software (SDLC) y el aseguramiento del desarrollo seguro (SSD), consulta el archivo de estatus técnico:
-*   [PROJECT_STATUS.md](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/PROJECT_STATUS.md)
+Para detalles específicos sobre la arquitectura, el desarrollo guiado por especificaciones (SDD/Spec-Driven Development) y el desarrollo seguro (SSD), consulta los siguientes documentos:
+*   [PROJECT_STATUS.md](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/PROJECT_STATUS.md): Estado técnico, cobertura de pruebas unitarias/integración y cumplimiento SSD.
+*   [SDD.md](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SDD.md): Especificación detallada del flujo de diseño de software y metodología SDD.
