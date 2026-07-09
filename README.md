@@ -1,108 +1,75 @@
-# 🛡️ SIGERI: Sistema de Gestión de Riesgos e Infraestructura
+# SIGERI - Sistema de Gestión de Riesgos de Ciberseguridad Industrial
 
-**Estado del Proyecto:** MVP (Minimum Viable Product) - *Tesis de Ingeniería de Sistemas*  
-**Tecnología:** .NET 10, ASP.NET Core Razor Pages, Entity Framework Core 10, CQRS, MediatR.  
-**Arquitectura:** Clean Architecture.
+SIGERI es una plataforma empresarial moderna diseñada para la gestión, evaluación, tratamiento y monitoreo de riesgos de ciberseguridad en entornos industriales, alineada con marcos internacionales como **NIST CSF** e **ISO 27001**.
 
 ---
 
-## 📑 1. Objetivo General
-Desarrollar e implementar un software analítico que automatice y converja metodologías internacionales de gestión de riesgos tecnológicos e industriales. SIGERI transforma vulnerabilidades técnicas y operativas en métricas financieras cuantitativas, facilitando la toma de decisiones estratégicas, el cumplimiento normativo (Ley 29733) y la justificación económica de presupuestos de ciberseguridad.
+## 🛠️ Arquitectura y Tecnologías
+
+El sistema está desarrollado bajo los principios de **Clean Architecture** (Arquitectura Limpia) y **DDD (Domain-Driven Design)**, garantizando el desacoplamiento de componentes, mantenibilidad y testabilidad.
+
+### Estructura de Proyectos
+1.  **[SIGERI.Domain](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.Domain)**: Entidades de negocio, enums y objetos de valor (Value Objects). No posee dependencias externas.
+2.  **[SIGERI.Application](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.Application)**: Interfaces, DTOs, Casos de Uso (Command/Query con MediatR), comportamientos de tubería (Pipeline Behaviors) y validadores.
+3.  **[SIGERI.Infrastructure](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.Infrastructure)**: Persistencia de datos (Entity Framework Core con SQL Server), servicios de infraestructura y semilla de datos (Seed Data).
+4.  **[SIGERI.Web](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.Web)**: Capa de presentación ASP.NET Core MVC. Interfaz moderna, responsiva y segura.
+5.  **[SIGERI.UnitTests](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.UnitTests)**: Pruebas unitarias integrales de controladores, validadores y comportamientos.
+6.  **[SIGERI.IntegrationTests](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/SIGERI.IntegrationTests)**: Pruebas de integración reales utilizando **Testcontainers** y Docker.
 
 ---
 
-## 🔍 2. Fase de Análisis: Convergencia Metodológica
-El núcleo científico y de ingeniería de SIGERI radica en la unificación de cuatro marcos de control que estructuran todo el sistema:
+## 🚀 Guía de Inicio Rápido
 
-1. **MAGERIT v3 (Enfoque Taxonómico / Top-Down):**
-   - Clasifica los activos en contenedores (Datos, Servicios, Software, Hardware, Redes, Personal).
-   - Establece la trazabilidad de dependencias: Cómo la falla de un equipo auxiliar afecta un proceso core corporativo.
-2. **OCTAVE Allegro (Enfoque Selectivo de Negocio):**
-   - Filtra los activos críticos del negocio.
-   - Mide el impacto en 5 áreas clave: Reputación, Financiero, Productividad, Legal y SSOMA.
-3. **NIST CSF 2.0 & CIS Controls v8 (Diagnóstico de Madurez):**
-   - Agrupa controles técnicos bajo 6 funciones: *Govern, Identify, Protect, Detect, Respond, Recover*.
-   - Diagnostica brechas de madurez (0 a 4) estableciendo la postura de ciberseguridad de la empresa.
-4. **Modelado Financiero y ROSI (Expectativa de Pérdida / ROI):**
-   - **SLE:** Pérdida Esperada Única.
-   - **ARO:** Tasa Anualizada de Ocurrencia.
-   - **ALE:** Pérdida Anualizada Esperada ($ALE = SLE \times ARO$).
-   - **ROSI:** Retorno de Inversión en Seguridad.
+### Requisitos Previos
+*   [.NET SDK 10](https://dotnet.microsoft.com/)
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (para pruebas de integración con Testcontainers)
+*   Microsoft SQL Server LocalDB o Instancia de SQL Server
 
----
+### 1. Clonar y Compilar
+Abre tu consola y compila la solución completa:
+```bash
+dotnet restore SIGERI.Web.slnx
+dotnet build SIGERI.Web.slnx -c Debug
+```
 
-## 📐 3. Fase de Diseño: Arquitectura Limpia (Clean Architecture)
-El diseño del software sigue principios de separación de responsabilidades para asegurar un ciclo de vida mantenible y agnóstico a integraciones de terceros.
+### 2. Configurar Base de Datos
+El proyecto tiene las migraciones listas. Aplica las migraciones a tu base de datos local:
+```bash
+dotnet ef database update --project SIGERI.Infrastructure --startup-project SIGERI.Web
+```
+*Nota: Al iniciar la aplicación web por primera vez, el sistema ejecutará la semilla automática de datos (`SeedData.cs`), creando el usuario administrador default (`admin@sigeri.local` / `Admin123#`).*
 
-### Capas del Proyecto:
-- **SIGERI.Domain (Núcleo / Enterprise Business Rules):**
-  - Contiene las entidades puras (Activos, Riesgos, Evaluaciones, Tratamiento).
-  - Define Enumeradores (Categorías MAGERIT, Criticidad) y Lógica Inmutable.
-- **SIGERI.Application (Casos de Uso / Use Cases):**
-  - Implementa el patrón **CQRS** (Command Query Responsibility Segregation) con **MediatR**.
-  - Canaliza la lógica transaccional en `Commands` (Registrar, Evaluar, Asignar) y la lectura en `Queries`.
-  - Validación perimetral de modelos de entrada usando **FluentValidation**.
-- **SIGERI.Infrastructure (Persistencia y Servicios):**
-  - Aislamiento de la base de datos vía abstractions (`ISigeriDbContext`).
-  - Implementación con **Entity Framework Core 10** (SQL Server).
-  - Manejo de borrado lógico interceptado nativamente desde DbContext (`HasQueryFilter`).
-- **SIGERI.Web (Presentación / UI Web):**
-  - Interfaz gráfica basada en **ASP.NET Core Razor**.
-  - Estilos con **Bootstrap 5** (Diseño Dark Terminal / Industrial Blueprint).
-  - Visualización interactiva con **Chart.js** y Modales nativos interconectados con APIs.
+### 3. Ejecutar la Aplicación Web
+Inicia la capa de presentación:
+```bash
+dotnet run --project SIGERI.Web
+```
+Accede al portal en [http://localhost:5000](http://localhost:5000) o la URL indicada en consola.
 
 ---
 
-## 🏗️ 4. Modelado de Diseño de Software (SDD - Software Design Document)
-La estructura modular (SDD) que rige las especificaciones técnicas del software y su mapa transaccional:
+## 🧪 Pruebas Unitarias e Integración
 
-### A. Módulo de Inventario (Gestión de Activos)
-- Entidad `Activo`: *Id, Codigo, Nombre, Descripcion, TipoActivo (Enum), Criticidad, Propietario*.
-- Flujo: Ingreso guiado por catálogo MAGERIT, asignación de propietario (Dueño del riesgo).
+### Pruebas Unitarias
+Ejecuta la suite de pruebas unitarias para validar las reglas de negocio y manejadores:
+```bash
+dotnet test SIGERI.UnitTests
+```
 
-### B. Módulo de Evaluación de Riesgos
-- Entidad `EvaluacionRiesgo`: *Calcula y persiste la cruce de Probabilidad (1-5) vs Impacto (1-5).*
-- Artefacto visual: **Matriz de Calor Matemática 5x5**. (Zonas Baja, Media, Alta, Crítica).
+### Pruebas de Integración con Testcontainers
+Asegúrate de tener **Docker Desktop iniciado** y ejecuta:
+```bash
+dotnet test SIGERI.IntegrationTests
+```
+*Este comando descargará de forma segura la imagen oficial de SQL Server (`mcr.microsoft.com/mssql/server:2022-latest`), creará un contenedor temporal, aplicará las migraciones, correrá las pruebas y destruirá el contenedor automáticamente al finalizar.*
 
-### C. Módulo de Tratamiento y Analítica Financiera (ROSI)
-- Entidad `PlanTratamiento`: *Costos de Salvaguarda, Porcentaje de Mitigación Esperada.*
-- Flujo (Motor Matemático): 
-  - Resta el porcentaje de mitigación al ALE Base obteniendo el **ALE Residual**.
-  - Aplica la fórmula de Sonnenreich para obtener la viabilidad financiera del proyecto (% ROSI).
-
-### D. Sistema de Control de Acceso y Seguridad
-- Patrón Perimetral: **Cookies Authentication Middleware**.
-- Uso de `ClaimsPrincipal` con asignación de Roles (`Administrador`, `Analista`).
-- Atributos `[Authorize]` a nivel de controladores de Razor.
+### Ejecutar Todas las Pruebas de la Solución
+```bash
+dotnet test
+```
 
 ---
 
-## 📊 5. Panel de Rendimiento (Caso de Estudio - Data Semilla)
-El MVP precarga métricas base derivadas de incidentes comprobados en infraestructura crítica:
-- **ALE Total Expuesto:** S/ 870,000 (Riesgo inherente de Ransomware SCADA, Phishing, Manipulación PLC).
-- **Inversión Planificada:** S/ 300,000.
-- **ALE Residual Mitigado:** S/ 183,000.
-- **ROSI Promedio:** 129% *(Justificativo ante Junta Directiva: Cada 1 S/ invertido ahorra 1.29 S/ adicionales)*.
-
----
-
-## 🚀 6. Guía de Ejecución (Runbook)
-
-1. Clonar el repositorio del workspace de SIGERI.
-2. Abrir terminal en la raíz (`C:\Users\USUARIO\source\repos\SIGERI.Web\`).
-3. Restaurar dependencias:  
-   ```powershell
-   dotnet restore
-   ```
-4. Ejecutar el proyecto Web:  
-   ```powershell
-   cd SIGERI.Web
-   dotnet run --launch-profile "http"
-   ```
-5. Acceder en el navegador a `http://localhost:5100`.
-6. Credenciales de sustentación habilitadas en entorno local:
-   - Se configuran mediante `DevCredentials` en `appsettings.Development.json` o variables de entorno.
-   - El usuario administrador y el analista de riesgos se crean automáticamente al iniciar la aplicación en desarrollo.
-
----
-*Este documento SDD (Software Design Document) forma parte de los anexos del proyecto de tesis. Refleja fielmente los procesos de ingeniería de software implementados en el artefacto final.*
+## 📝 Documentación del Proyecto
+Para detalles específicos sobre el cumplimiento del ciclo de vida de desarrollo de software (SDLC) y el aseguramiento del desarrollo seguro (SSD), consulta el archivo de estatus técnico:
+*   [PROJECT_STATUS.md](file:///c:/Users/USUARIO/source/repos/SIGERI.Web/PROJECT_STATUS.md)
