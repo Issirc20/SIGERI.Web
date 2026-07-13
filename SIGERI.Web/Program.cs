@@ -30,10 +30,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-// Apply pending migrations and seed reference data only in Development.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<SigeriDbContext>();
     db.Database.Migrate();
     SeedData.EnsureSeeded(db, app.Configuration);
